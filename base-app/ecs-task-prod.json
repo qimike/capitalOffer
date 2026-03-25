@@ -31,6 +31,16 @@
           "containerPort": 3000
         }
       ],
+      "environment": [
+        {
+          "name": "DEBUG",
+          "value": "0"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ],
       "dependsOn": [
         {
           "containerName": "db",
