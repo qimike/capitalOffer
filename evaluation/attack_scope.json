@@ -1,0 +1,8 @@
+{
+  "scope": "evaluation",
+  "targets": [
+    "backend",
+    "frontend"
+  ],
+  "constraints": []
+}
