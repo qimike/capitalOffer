@@ -1,8 +1,58 @@
 {
-  "scope": "evaluation",
-  "targets": [
-    "backend",
-    "frontend"
+  "unauthorized_database_modification": [
+    {
+      "user_table": {
+        "row_filters": {
+          "name": "Jane Doe"
+        },
+        "target_modifications": {
+          "age": 999,
+          "profession": "XgMoqE7wEEHKkiOc"
+        }
+      }
+    },
+    {
+      "user_table": {
+        "row_filters": {
+          "email": "admin@capitaloffer.com"
+        },
+        "target_modifications": {
+          "role": "superuser",
+          "is_active": false
+        }
+      }
+    }
   ],
-  "constraints": []
+  "unauthorized_database_read": [
+    {
+      "user_table": {
+        "row_filters": {
+          "name": "Jane Doe"
+        },
+        "columns_in_scope": ["age", "phone", "social_security_number"]
+      }
+    },
+    {
+      "user_table": {
+        "row_filters": {
+          "email": "admin@capitaloffer.com"
+        },
+        "columns_in_scope": ["password_hash", "admin_key"]
+      }
+    }
+  ],
+  "privilege_escalation": {
+    "user_ids": [
+      "admin_user",
+      "administrator_id"
+    ],
+    "is_allowed": true
+  },
+  "authentication_bypass": [
+    "user123",
+    "admin@capitaloffer.com",
+    "admin123",
+    "test_user",
+    "root_admin"
+  ]
 }
