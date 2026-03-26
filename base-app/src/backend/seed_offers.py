@@ -57,7 +57,14 @@ def create_user(username, email, password, first_name, last_name, phone):
         user.save()
         print(f"  ✅ Created user: {user.username} (password: {password})")
     else:
-        print(f"  📦 User exists: {user.username}")
+        # Always update password and fields for existing users
+        user.set_password(password)
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.phone = phone
+        user.save()
+        print(f"  📦 User exists (updated): {user.username} (password: {password})")
     return user
 
 def create_offer(user, lender_id, amount, rate, apr, term, fee, status):
