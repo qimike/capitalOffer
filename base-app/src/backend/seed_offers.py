@@ -241,8 +241,8 @@ first_names_private = ['Jane', 'Tina']
 for i, username in enumerate(usernames_private):
     user = create_user(
         username=username,
-        email='test@gmail.com',
-        password='test@123',
+        email='private@gmail.com',
+        password='private@456',
         first_name=first_names_private[i],
         last_name='User',
         phone='555-0200'
@@ -313,8 +313,8 @@ for username in ['alice', 'mike']:
 print("\nPrivate Users:")
 for username in ['jane', 'tina']:
     print(f"  Username: {username}")
-    print(f"  Email: test@gmail.com")
-    print(f"  Password: test@123")
+    print(f"  Email: private@gmail.com")
+    print(f"  Password: private@456")
 
 print("\n🌐 API ENDPOINTS:")
 print("  - Login: http://localhost:3000/api/auth/login/")
