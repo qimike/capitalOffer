@@ -64,7 +64,10 @@ class OfferViewSet(viewsets.ModelViewSet):
         """Filter offers based on query parameters."""
         user = self.request.user
         
-        if self.request.user.is_authenticated and self.action == 'list':
+        # For browse_list action, show public offers only
+        if getattr(self, 'action', '') == 'browse_list':
+            queryset = Offer.objects.filter(visibility='public')
+        elif self.request.user.is_authenticated and self.action == 'list':
             # Only show offers for the logged-in user
             queryset = Offer.objects.filter(user=user)
         else:

@@ -79,9 +79,9 @@
             </div>
 
             <div class="mb-3">
-              <h2 class="text-primary mb-1">${{ (offer.amount / 1000).toFixed(1) }}k</h2>
+              <h2 class="text-primary mb-1">${{ (offer.loan_amount / 1000).toFixed(0) }}k</h2>
               <p class="text-muted mb-0">
-                {{ offer.term }} months @ {{ offer.rate }}% APR
+                {{ offer.term_months }} months @ {{ offer.interest_rate }}% APR
               </p>
             </div>
 
@@ -89,10 +89,10 @@
               <div
                 class="progress-bar"
                 role="progressbar"
-                :style="{ width: (offer.term / 60) * 100 + '%' }"
+                :style="{ width: (offer.term_months / 60) * 100 + '%' }"
               ></div>
             </div>
-            <small class="text-muted">{{ offer.term }} months</small>
+            <small class="text-muted">{{ offer.term_months }} months</small>
           </div>
 
           <div class="card-footer border-0 py-3">
@@ -110,25 +110,20 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && offers.length > 0" class="d-flex justify-content-center mt-4">
+    <div v-if="!loading && offers.length > 0" class="d-flex justify-content-center align-items-center mt-4">
       <nav>
-        <ul class="pagination">
+        <ul class="pagination mb-0">
           <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" href="#" @click.prevent="currentPage--">Previous</a>
+            <a class="page-link" href="#" @click.prevent="currentPage = currentPage - 1">Previous</a>
           </li>
-          <li
-            v-for="page in totalPages"
-            :key="page"
-            class="page-item"
-            :class="{ active: page === currentPage }"
-          >
-            <a class="page-link" href="#" @click.prevent="currentPage = page">{{ page }}</a>
-          </li>
-          <li class="page-item" :class="{ disabled: currentPage === totalPages }">
-            <a class="page-link" href="#" @click.prevent="currentPage++">Next</a>
+          <li class="page-item" :class="{ disabled: currentPage >= totalPages }">
+            <a class="page-link" href="#" @click.prevent="currentPage = currentPage + 1">Next</a>
           </li>
         </ul>
       </nav>
+      <small class="text-muted ms-3" style="line-height: 1.5;">
+        Page {{ currentPage }} of {{ totalPages }}
+      </small>
     </div>
   </div>
 </template>
@@ -144,9 +139,10 @@ const filterStatus = ref('')
 const sortBy = ref('amount_desc')
 const currentPage = ref(1)
 const limit = ref(10)
+const totalCount = ref(0)
 
 const totalPages = computed(() => {
-  return Math.ceil(offers.value.length / limit.value)
+  return Math.max(1, Math.ceil(totalCount.value / limit.value))
 })
 
 const hasFilters = computed(() => {
@@ -159,18 +155,38 @@ onMounted(() => {
 
 const fetchOffers = async () => {
   loading.value = true
+  console.log('\n=== Fetching offers for user ===')
   try {
-    offers.value = await api.offers.getList({
+    const data = await api.offers.getAll({
       page: currentPage.value,
       limit: limit.value,
       status: filterStatus.value || '',
       sort: sortBy.value,
       search: searchQuery.value || ''
     })
+    
+    console.log('API Response:', data)
+    
+    // Handle DRF pagination response format
+    if (data && data.results) {
+      offers.value = data.results
+      console.log('Offers extracted from results:', offers.value.length)
+    } else if (Array.isArray(data)) {
+      offers.value = data
+      console.log('Offers is array:', offers.value.length)
+    } else if (data && data.offers) {
+      offers.value = data.offers
+      console.log('Offers extracted from data.offers:', offers.value.length)
+    } else {
+      offers.value = []
+      console.log('No offers found in response')
+    }
   } catch (err) {
     console.error('Error fetching offers:', err)
+    offers.value = []
   } finally {
     loading.value = false
+    console.log('Final offers count:', offers.value.length)
   }
 }
 

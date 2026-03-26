@@ -119,6 +119,7 @@ def create_offer(user, lender_id, amount, rate, apr, term, fee, status):
         origination_fee=origination_fee,
         monthly_payment=round(monthly_payment, 2),
         status=status,
+        visibility='public',
         expiry_date=expiry_date,
         lender_notes=f"Pre-approved offer from {lender_name}"
     )

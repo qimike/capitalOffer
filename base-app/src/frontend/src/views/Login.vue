@@ -6,7 +6,7 @@
           <div class="card shadow">
             <div class="card-body p-5">
               <h3 class="text-center mb-4">
-                <i class="bi bi-wallet2 me-2"></i>capitalOffer
+                <i class="bi bi-wallet2 me-2"></i>Capital Offer
               </h3>
               
               <form @submit.prevent="handleLogin" novalidate>

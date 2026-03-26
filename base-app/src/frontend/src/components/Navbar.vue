@@ -4,7 +4,7 @@
       <!-- Logo -->
       <RouterLink to="/offers" class="navbar-brand d-flex align-items-center">
         <i class="bi bi-wallet2 me-2"></i>
-        <span class="fw-bold">capitalOffer</span>
+        <span class="fw-bold">Capital Offer</span>
       </RouterLink>
 
       <!-- Mobile Toggle -->

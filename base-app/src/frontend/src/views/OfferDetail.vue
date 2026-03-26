@@ -17,8 +17,7 @@
                 <h2 class="mb-2">{{ offer.lender.name }}</h2>
                 <div class="mb-2">
                   <i class="bi bi-star-fill text-warning"></i>
-                  <span class="text-success">{{ offer.lender.rating }}/5.0</span>
-                  <span class="text-muted ms-2">({{ offer.lender.reviews }} reviews)</span>
+                  <span class="text-muted ms-2">{{ offer.lender.description }}</span>
                 </div>
               </div>
               <span
@@ -43,19 +42,19 @@
             <div class="row g-4">
               <div class="col-6">
                 <h6 class="text-muted">Loan Amount</h6>
-                <h3 class="text-primary mb-0">${{ formatAmount(offer.amount) }}</h3>
+                <h3 class="text-primary mb-0">{{ formatAmount(offer.loan_amount) }}</h3>
               </div>
               <div class="col-6">
                 <h6 class="text-muted">Interest Rate (APR)</h6>
-                <h3 class="text-success mb-0">{{ offer.rate }}%</h3>
+                <h3 class="text-success mb-0">{{ offer.interest_rate }}%</h3>
               </div>
               <div class="col-6">
                 <h6 class="text-muted">Loan Term</h6>
-                <h3 class="mb-0">{{ offer.term }} months</h3>
+                <h3 class="mb-0">{{ offer.term_months }} months</h3>
               </div>
               <div class="col-6">
                 <h6 class="text-muted">Monthly Payment</h6>
-                <h3 class="mb-0">${{ formatAmount(offer.monthlyPayment) }}</h3>
+                <h3 class="mb-0">{{ formatAmount(offer.monthly_payment) }}</h3>
               </div>
             </div>
           </div>
@@ -69,20 +68,20 @@
           <div class="card-body">
             <ul class="list-unstyled">
               <li class="mb-3">
-                <strong><i class="bi bi-check-circle-fill text-success"></i> Early Repayment:</strong>
-                <p class="d-inline">{{ offer.terms.earlyRepayment }}</p>
+                <strong><i class="bi bi-check-circle-fill text-success"></i> Origination Fee: </strong>
+                <p class="d-inline">{{ formatAmount(offer.origination_fee) }}</p>
               </li>
               <li class="mb-3">
-                <strong><i class="bi bi-check-circle-fill text-success"></i> Prepayment Penalties:</strong>
-                <p class="d-inline">{{ offer.terms.prepaymentPenalty }}</p>
+                <strong><i class="bi bi-check-circle-fill text-success"></i> Status: </strong>
+                <p class="d-inline">{{ offer.status }}</p>
               </li>
               <li class="mb-3">
-                <strong><i class="bi bi-check-circle-fill text-success"></i> Grace Period:</strong>
-                <p class="d-inline">{{ offer.terms.gracePeriod }}</p>
+                <strong><i class="bi bi-calendar-check-fill text-success"></i> Expiry Date: </strong>
+                <p class="d-inline">{{ formatDate(offer.expiry_date) }}</p>
               </li>
               <li class="mb-3">
-                <strong><i class="bi bi-exclamation-triangle-fill text-warning"></i> Late Payment:</strong>
-                <p class="d-inline">{{ offer.terms.lateFee }}</p>
+                <strong><i class="bi bi-exclamation-triangle-fill text-warning"></i> Lender Notes: </strong>
+                <p class="d-inline">{{ offer.lender_notes || 'No notes' }}</p>
               </li>
             </ul>
           </div>
@@ -97,26 +96,26 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <div>
-                  <strong>Offer ID:</strong>
+                  <strong>Offer ID: </strong>
                   <p class="d-inline">{{ offer.id }}</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div>
-                  <strong>Created:</strong>
-                  <p class="d-inline">{{ formatDate(offer.createdAt) }}</p>
+                  <strong>Created: </strong>
+                  <p class="d-inline">{{ formatDate(offer.created_at) }}</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div>
-                  <strong>Expires:</strong>
-                  <p class="d-inline">{{ formatDate(offer.expiryDate) }}</p>
+                  <strong>Expires: </strong>
+                  <p class="d-inline">{{ formatDate(offer.expiry_date) }}</p>
                 </div>
               </div>
               <div class="col-md-6">
                 <div>
-                  <strong>Last Updated:</strong>
-                  <p class="d-inline">{{ formatDate(offer.updatedAt) }}</p>
+                  <strong>Last Updated: </strong>
+                  <p class="d-inline">{{ formatDate(offer.updated_at) }}</p>
                 </div>
               </div>
             </div>
@@ -202,15 +201,22 @@ onMounted(() => {
 })
 
 const fetchOfferDetail = async () => {
+  console.log('\n=== Fetching offer detail for ID:', route.params.id, '===')
   try {
     offer.value = await api.offers.getById(route.params.id)
+    console.log('Offer data:', offer.value)
   } catch (err) {
     console.error('Error fetching offer:', err)
   }
 }
 
 const formatAmount = (amount) => {
-  return (amount / 100).toFixed(0)
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount)
 }
 
 const formatDate = (date) => {
@@ -253,7 +259,7 @@ const viewContract = () => {
 }
 
 const shareOffer = (type) => {
-  alert(`Share via ${type} functionality coming soon!`)
+  alert(`Share via {type} functionality coming soon!`)
 }
 </script>
 

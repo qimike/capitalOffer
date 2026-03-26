@@ -83,6 +83,10 @@ export const api = {
       const queryParams = new URLSearchParams(params).toString()
       return apiRequest(`/api/offers/?${queryParams}`)
     },
+    browse: (params = {}) => {
+      const queryParams = new URLSearchParams(params).toString()
+      return apiRequest(`/api/offers/browse/?${queryParams}`)
+    },
     getById: (id) => apiRequest(`/api/offers/${id}/`),
     create: (data) => apiRequest('/api/offers/', {
       method: 'POST',

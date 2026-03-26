@@ -90,6 +90,10 @@ class Offer(models.Model):
         ('accepted', 'Accepted'),
         ('declined', 'Declined')
     ]
+    VISIBILITY_CHOICES = [
+        ('public', 'Public'),
+        ('private', 'Private')
+    ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='offers')
     lender = models.ForeignKey(Lender, on_delete=models.CASCADE, related_name='offers')
@@ -100,13 +104,15 @@ class Offer(models.Model):
     origination_fee = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     monthly_payment = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='public')
     expiry_date = models.DateTimeField()
     lender_notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Offer ${self.loan_amount} from {self.lender.name} for {self.user.username}"
+        visibility_str = 'Public' if self.visibility == 'public' else 'Private'
+        return f"{visibility_str} Offer ${self.loan_amount} from {self.lender.name} for {self.user.username}"
 
     class Meta:
         db_table = 'offers'
@@ -117,6 +123,7 @@ class Offer(models.Model):
             models.Index(fields=['status']),
             models.Index(fields=['user_id']),
             models.Index(fields=['lender_id']),
+            models.Index(fields=['visibility']),
         ]
 
 
