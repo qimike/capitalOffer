@@ -43,11 +43,11 @@
               </div>
               <div class="col-md-6">
                 <strong>Phone: </strong>
-                <p class="d-inline">{{ profileData || 'Not provided' }}</p>
+                <p class="d-inline">{{ profileData?.phone || 'Not provided' }}</p>
               </div>
               <div class="col-md-6">
                 <strong>Date of Birth: </strong>
-                <p class="d-inline">{{ profileData || 'Not provided' }}</p>
+                <p class="d-inline">{{ formatDate(profileData?.date_joined) }}</p>
               </div>
             </div>
           </div>
@@ -154,6 +154,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { api } from '@/api'
 
 const userId = ref(localStorage.getItem('userId'))
 const userName = ref(localStorage.getItem('userName') || 'User')
@@ -164,16 +165,14 @@ const profileData = ref(null)
 // Fetch profile data from API
 onMounted(async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/users/profile/')
-    const data = await response.json()
+    profileData.value = await api.profile.get()
     
-    if (data.name) {
-      userName.value = data.name
+    if (profileData.value.full_name) {
+      userName.value = profileData.value.full_name
     }
-    if (data.email) {
-      userEmail.value = data.email
+    if (profileData.value.email) {
+      userEmail.value = profileData.value.email
     }
-    profileData.value = data
   } catch (err) {
     console.error('Error fetching profile:', err)
   }

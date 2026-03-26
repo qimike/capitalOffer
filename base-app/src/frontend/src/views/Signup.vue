@@ -152,6 +152,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { api } from '@/api'
 
 const router = useRouter()
 
@@ -208,28 +209,16 @@ const handleSignup = async () => {
   loading.value = true
 
   try {
-    const response = await fetch('http://localhost:3000/api/auth/signup/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: name.value.trim(),
-        email: email.value,
-        password: password.value
-      })
+    await api.auth.signup({
+      username: name.value.trim(),
+      email: email.value,
+      password: password.value
     })
 
-    const data = await response.json()
-
-    if (response.ok) {
-      // Redirect to login page
-      router.push('/login')
-    } else {
-      error.value = data.error || 'Signup failed. Please try again.'
-    }
+    // Redirect to login page
+    router.push('/login')
   } catch (err) {
-    error.value = 'An error occurred. Please try again.'
+    error.value = err.details?.error || err.message || 'Signup failed. Please try again.'
     console.error('Signup error:', err)
   } finally {
     loading.value = false

@@ -190,6 +190,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { api } from '@/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -202,9 +203,7 @@ onMounted(() => {
 
 const fetchOfferDetail = async () => {
   try {
-    const response = await fetch(`http://localhost:3000/api/offers/${route.params.id}/`)
-    const data = await response.json()
-    offer.value = data
+    offer.value = await api.offers.getById(route.params.id)
   } catch (err) {
     console.error('Error fetching offer:', err)
   }
@@ -234,15 +233,17 @@ const statusBadgeClass = (status) => {
 
 const acceptOffer = () => {
   if (confirm('Are you sure you want to accept this offer?')) {
-    // API call to accept offer
-    router.push('/offers')
+    api.offers.accept(offer.value.id)
+      .then(() => router.push('/offers'))
+      .catch(err => console.error('Accept error:', err))
   }
 }
 
 const declineOffer = () => {
   if (confirm('Are you sure you want to decline this offer?')) {
-    // API call to decline offer
-    router.push('/offers')
+    api.offers.decline(offer.value.id, { reason: 'Not interested' })
+      .then(() => router.push('/offers'))
+      .catch(err => console.error('Decline error:', err))
   }
 }
 

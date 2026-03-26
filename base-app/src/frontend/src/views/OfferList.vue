@@ -135,6 +135,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { api } from '@/api'
 
 const offers = ref([])
 const loading = ref(true)
@@ -159,20 +160,13 @@ onMounted(() => {
 const fetchOffers = async () => {
   loading.value = true
   try {
-    const params = new URLSearchParams({
+    offers.value = await api.offers.getList({
       page: currentPage.value,
       limit: limit.value,
       status: filterStatus.value || '',
       sort: sortBy.value,
       search: searchQuery.value || ''
     })
-
-    const response = await fetch(`http://localhost:3000/api/offers/?${params}`)
-    const data = await response.json()
-    
-    if (data.offers) {
-      offers.value = data.offers
-    }
   } catch (err) {
     console.error('Error fetching offers:', err)
   } finally {

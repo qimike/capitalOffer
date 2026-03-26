@@ -95,6 +95,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { api } from '@/api'
 
 const router = useRouter()
 const route = useRoute()
@@ -125,20 +126,12 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    const response = await fetch('http://localhost:3000/api/auth/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: username.value,
-        password: password.value
-      })
+    const data = await api.auth.login({
+      username: username.value,
+      password: password.value
     })
 
-    const data = await response.json()
-
-    if (response.ok) {
+    if (data.token) {
       // Save authentication token
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('isAuthenticated', 'true')
@@ -153,7 +146,7 @@ const handleLogin = async () => {
       error.value = data.error || 'Login failed. Please try again.'
     }
   } catch (err) {
-    error.value = 'An error occurred. Please try again.'
+    error.value = err.details?.error || err.message || 'Login failed. Please try again.'
     console.error('Login error:', err)
   } finally {
     loading.value = false
