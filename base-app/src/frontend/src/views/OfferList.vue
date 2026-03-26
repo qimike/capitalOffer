@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="offers-container" style="padding-top: 80px;">
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h2><i class="bi bi-wallet2 me-2"></i>My Offers</h2>

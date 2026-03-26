@@ -7,7 +7,7 @@ services:
     container_name: capitaloffer_db
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "5433:5432"  # Changed from 5432 to 5433 to avoid conflict
     environment:
       POSTGRES_DB: capitaloffer
       POSTGRES_USER: postgres

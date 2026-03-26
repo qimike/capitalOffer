@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="profile-container" style="padding-top: 80px;">
     <h2 class="mb-4">
       <i class="bi bi-person-circle me-2"></i>My Profile
     </h2>
@@ -27,26 +27,26 @@
       <!-- Profile Details -->
       <div class="col-md-8">
         <!-- Personal Information -->
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-5">
           <div class="card-header bg-white">
             <h5 class="mb-0">Personal Information</h5>
           </div>
           <div class="card-body">
             <div class="row g-3">
               <div class="col-md-6">
-                <strong>Full Name</strong>
+                <strong>Full Name: </strong>
                 <p class="d-inline">{{ userName }}</p>
               </div>
               <div class="col-md-6">
-                <strong>Email</strong>
+                <strong>Email: </strong>
                 <p class="d-inline">{{ userEmail }}</p>
               </div>
               <div class="col-md-6">
-                <strong>Phone</strong>
+                <strong>Phone: </strong>
                 <p class="d-inline">{{ profileData || 'Not provided' }}</p>
               </div>
               <div class="col-md-6">
-                <strong>Date of Birth</strong>
+                <strong>Date of Birth: </strong>
                 <p class="d-inline">{{ profileData || 'Not provided' }}</p>
               </div>
             </div>
@@ -54,29 +54,29 @@
         </div>
 
         <!-- Account Information -->
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-5">
           <div class="card-header bg-white">
             <h5 class="mb-0">Account Information</h5>
           </div>
           <div class="card-body">
             <div class="row g-3">
               <div class="col-md-6">
-                <strong>Account Type</strong>
+                <strong>Account Type:  </strong>
                 <p class="d-inline">Standard</p>
               </div>
               <div class="col-md-6">
-                <strong>Account Status</strong>
+                <strong>Account Status: </strong>
                 <span class="badge bg-success">
                   <i class="bi bi-check-circle me-1"></i>
                   Active
                 </span>
               </div>
               <div class="col-md-6">
-                <strong>Member Since</strong>
+                <strong>Member Since: </strong>
                 <p class="d-inline">{{ formatDate('2024-01-01') }}</p>
               </div>
               <div class="col-md-6">
-                <strong>Last Login</strong>
+                <strong>Last Login: </strong>
                 <p class="d-inline">{{ formatDate(new Date().toISOString()) }}</p>
               </div>
             </div>
@@ -84,7 +84,7 @@
         </div>
 
         <!-- Security Settings -->
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-5">
           <div class="card-header bg-white">
             <h5 class="mb-0">Security Settings</h5>
           </div>
@@ -111,7 +111,7 @@
         </div>
 
         <!-- Account Activity -->
-        <div class="card shadow-sm">
+        <div class="card shadow-sm mb-5">
           <div class="card-header bg-white">
             <h5 class="mb-0">Account Activity</h5>
           </div>

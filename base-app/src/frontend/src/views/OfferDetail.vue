@@ -1,5 +1,5 @@
 <template>
-  <div v-if="offer">
+  <div v-if="offer" class="offer-detail-container" style="padding-top: 80px;">
     <nav aria-label="breadcrumb" class="mb-4">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><router-link to="/offers">Offers</router-link></li>

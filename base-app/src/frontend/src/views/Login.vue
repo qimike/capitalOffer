@@ -1,87 +1,89 @@
 <template>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6 col-lg-4">
-        <div class="card shadow">
-          <div class="card-body p-5">
-            <h3 class="text-center mb-4">
-              <i class="bi bi-wallet2 me-2"></i>capitalOffer
-            </h3>
-            
-            <form @submit.prevent="handleLogin" novalidate>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <i class="bi bi-envelope"></i>
-                  </span>
+  <div class="auth-container" style="padding-top: 80px;">
+    <div class="container mt-2">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow">
+            <div class="card-body p-5">
+              <h3 class="text-center mb-4">
+                <i class="bi bi-wallet2 me-2"></i>capitalOffer
+              </h3>
+              
+              <form @submit.prevent="handleLogin" novalidate>
+                <div class="mb-3">
+                  <label for="username" class="form-label">Username</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-person"></i>
+                    </span>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="username"
+                      v-model="username"
+                      placeholder="Enter your username"
+                      required
+                    />
+                  </div>
+                  <div class="invalid-feedback" v-if="errors.username">
+                    Username is required
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="password" class="form-label">Password</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-lock"></i>
+                    </span>
+                    <input
+                      type="password"
+                      class="form-control"
+                      id="password"
+                      v-model="password"
+                      required
+                    />
+                  </div>
+                  <div class="invalid-feedback" v-if="errors.password">
+                    Password is required
+                  </div>
+                </div>
+
+                <div class="mb-3 form-check">
                   <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    v-model="email"
-                    placeholder="name@example.com"
-                    required
+                    type="checkbox"
+                    class="form-check-input"
+                    id="rememberMe"
+                    v-model="rememberMe"
                   />
+                  <label class="form-check-label" for="rememberMe">
+                    Remember me
+                  </label>
                 </div>
-                <div class="invalid-feedback" v-if="errors.email">
-                  Please enter a valid email address
+
+                <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+                  {{ error }}
+                  <button type="button" class="btn-close" @click="error = ''"></button>
                 </div>
-              </div>
 
-              <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <div class="input-group">
-                  <span class="input-group-text">
-                    <i class="bi bi-lock"></i>
-                  </span>
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    v-model="password"
-                    required
-                  />
+                <div class="d-grid gap-2">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-lg"
+                    :disabled="loading"
+                  >
+                    <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ loading ? 'Logging in...' : 'Login' }}
+                  </button>
                 </div>
-                <div class="invalid-feedback" v-if="errors.password">
-                  Password is required
-                </div>
-              </div>
+              </form>
 
-              <div class="mb-3 form-check">
-                <input
-                  type="checkbox"
-                  class="form-check-input"
-                  id="rememberMe"
-                  v-model="rememberMe"
-                />
-                <label class="form-check-label" for="rememberMe">
-                  Remember me
-                </label>
+              <div class="text-center mt-4">
+                <p>New to capitalOffer?</p>
+                <router-link to="/signup" class="btn btn-outline-primary">
+                  Create Account
+                </router-link>
               </div>
-
-              <div v-if="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ error }}
-                <button type="button" class="btn-close" @click="error = ''"></button>
-              </div>
-
-              <div class="d-grid gap-2">
-                <button
-                  type="submit"
-                  class="btn btn-primary btn-lg"
-                  :disabled="loading"
-                >
-                  <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-                  {{ loading ? 'Logging in...' : 'Login' }}
-                </button>
-              </div>
-            </form>
-
-            <div class="text-center mt-4">
-              <p>New to capitalOffer?</p>
-              <router-link to="/signup" class="btn btn-outline-primary">
-                Create Account
-              </router-link>
             </div>
           </div>
         </div>
@@ -97,7 +99,7 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 const route = useRoute()
 
-const email = ref('')
+const username = ref('')
 const password = ref('')
 const rememberMe = ref(false)
 const loading = ref(false)
@@ -109,8 +111,8 @@ const handleLogin = async () => {
   errors.value = {}
 
   // Validation
-  if (!email.value) {
-    errors.value.email = 'Email is required'
+  if (!username.value) {
+    errors.value.username = 'Username is required'
   }
   if (!password.value) {
     errors.value.password = 'Password is required'
@@ -123,14 +125,13 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    // API call to login
-    const response = await fetch('http://localhost:3000/api/login/', {
+    const response = await fetch('http://localhost:3000/api/auth/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        email: email.value,
+        username: username.value,
         password: password.value
       })
     })
@@ -142,7 +143,8 @@ const handleLogin = async () => {
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('isAuthenticated', 'true')
       localStorage.setItem('userId', data.user.id)
-      localStorage.setItem('userName', data.user.name)
+      // Store username directly for display
+      localStorage.setItem('userName', data.user.username)
 
       // Redirect to intended page or offers
       const redirect = route.query.redirect || '/offers'

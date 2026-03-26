@@ -1,12 +1,13 @@
 <template>
-  <div class="container mt-5">
-    <div class="row justify-content-center">
-      <div class="col-md-6 col-lg-5">
-        <div class="card shadow">
-          <div class="card-body p-5">
-            <h3 class="text-center mb-4">
-              <i class="bi bi-person-plus me-2"></i>Sign Up
-            </h3>
+  <div class="auth-container" style="padding-top: 80px;">
+    <div class="container mt-2">
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+          <div class="card shadow">
+            <div class="card-body p-5">
+              <h3 class="text-center mb-4">
+                <i class="bi bi-person-plus me-2"></i>Sign Up
+              </h3>
             
             <form @submit.prevent="handleSignup" novalidate>
               <div class="mb-3">
@@ -144,6 +145,7 @@
         </div>
       </div>
     </div>
+   </div>
   </div>
 </template>
 
@@ -206,13 +208,13 @@ const handleSignup = async () => {
   loading.value = true
 
   try {
-    const response = await fetch('http://localhost:3000/api/signup/', {
+    const response = await fetch('http://localhost:3000/api/auth/signup/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        name: name.value.trim(),
+        username: name.value.trim(),
         email: email.value,
         password: password.value
       })
