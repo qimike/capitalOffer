@@ -83,17 +83,40 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 const isAuthenticated = ref(false)
 const userName = ref('')
 
-onMounted(() => {
-  // Check authentication from localStorage
+// Function to update auth state
+const updateAuthState = () => {
   isAuthenticated.value = localStorage.getItem('isAuthenticated') === 'true'
   userName.value = localStorage.getItem('userName') || 'User'
+}
+
+onMounted(() => {
+  // Initial state check
+  updateAuthState()
+  
+  // Listen for auth changes
+  const handleStateChange = () => {
+    updateAuthState()
+  }
+  
+  // Listen for storage events (when localStorage changes in another tab/window)
+  window.addEventListener('storage', handleStateChange)
+  
+  // Listen for route changes to refresh auth state
+  router.afterEach(() => {
+    updateAuthState()
+  })
+})
+
+onUnmounted(() => {
+  // Clean up
 })
 
 const logout = () => {
@@ -102,6 +125,9 @@ const logout = () => {
   localStorage.removeItem('isAuthenticated')
   localStorage.removeItem('userId')
   localStorage.removeItem('userName')
+
+  // Immediately update UI state
+  updateAuthState()
 
   // Redirect to login
   router.push('/login')
