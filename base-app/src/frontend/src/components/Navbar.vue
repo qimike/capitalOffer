@@ -122,6 +122,7 @@ onUnmounted(() => {
 const logout = () => {
   // Clear authentication data
   localStorage.removeItem('authToken')
+  localStorage.removeItem('refreshToken')
   localStorage.removeItem('isAuthenticated')
   localStorage.removeItem('userId')
   localStorage.removeItem('userName')

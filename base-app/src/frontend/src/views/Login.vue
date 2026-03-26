@@ -131,20 +131,21 @@ const handleLogin = async () => {
       password: password.value
     })
 
-    if (data.token) {
-      // Save authentication token
-      localStorage.setItem('authToken', data.token)
-      localStorage.setItem('isAuthenticated', 'true')
-      localStorage.setItem('userId', data.user.id)
-      // Store username directly for display
-      localStorage.setItem('userName', data.user.username)
+            if (data.access) {
+              // Save JWT tokens
+              localStorage.setItem('authToken', data.access)
+              localStorage.setItem('refreshToken', data.refresh)
+              localStorage.setItem('isAuthenticated', 'true')
+              localStorage.setItem('userId', data.user.id)
+              // Store username directly for display
+              localStorage.setItem('userName', data.user.username)
 
-      // Redirect to intended page or offers
-      const redirect = route.query.redirect || '/offers'
-      router.push(redirect)
-    } else {
-      error.value = data.error || 'Login failed. Please try again.'
-    }
+              // Redirect to intended page or offers
+              const redirect = route.query.redirect || '/offers'
+              router.push(redirect)
+            } else {
+              error.value = data.error || 'Login failed. Please try again.'
+            }
   } catch (err) {
     error.value = err.details?.error || err.message || 'Login failed. Please try again.'
     console.error('Login error:', err)

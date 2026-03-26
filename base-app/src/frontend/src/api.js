@@ -14,10 +14,10 @@ export async function apiRequest(endpoint, options = {}) {
     'Content-Type': 'application/json'
   }
   
-  // Add auth token if available
+  // Add JWT auth token if available
   const authToken = localStorage.getItem('authToken')
   if (authToken) {
-    defaultHeaders['Authorization'] = `Token ${authToken}`
+    defaultHeaders['Authorization'] = `Bearer ${authToken}`
   }
   
   const config = {

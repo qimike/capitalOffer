@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, generics, status
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import Q, OuterRef, Subquery, Max
@@ -20,7 +21,6 @@ from app.serializers import (
     OfferCreateSerializer, OfferDecisionSerializer,
     ShortlistSerializer, NotificationSerializer
 )
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import Permission
 
@@ -231,10 +231,12 @@ class AuthLoginView(generics.GenericAPIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        token, _ = Token.objects.get_or_create(user=user)
-
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        
         return Response({
-            'token': token.key,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
             'user': UserSerializer(user).data
         })
 
@@ -248,10 +250,13 @@ class AuthSignupView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        token, _ = Token.objects.get_or_create(user=user)
-
+        
+        # Generate JWT tokens for new user
+        refresh = RefreshToken.for_user(user)
+        
         return Response({
-            'token': token.key,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
             'user': UserSerializer(user).data
         }, status=status.HTTP_201_CREATED)
 
@@ -261,10 +266,8 @@ class AuthLogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        try:
-            Token.objects.get(key=request.auth).delete()
-        except:
-            pass
+        # For JWT, we don't need to delete tokens server-side
+        # The frontend will remove them from localStorage
         return Response({'status': 'Logged out successfully'})
 
 
