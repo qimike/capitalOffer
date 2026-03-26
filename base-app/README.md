@@ -14,7 +14,7 @@ CapitalOffer Full Stack Application with Python 3.13, Django 5.x, Vue 3, Bootstr
 ### Using Docker
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app
+cd /capitalOffer/base-app
 
 # Start all services
 docker-compose up -d
@@ -32,7 +32,7 @@ docker-compose exec backend python seed_offers.py
 ### Local Development (Python 3.13)
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/backend
+cd /capitalOffer/base-app/src/backend
 
 # Activate virtual environment
 source venv/bin/activate
@@ -50,7 +50,7 @@ python manage.py runserver 0.0.0.0:3000
 ## 🎨 Frontend Setup (Vue 3)
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/frontend
+cd /capitalOffer/base-app/src/frontend
 
 # Install dependencies
 npm install
@@ -64,7 +64,7 @@ npm run dev
 ## 🧪 Testing (Playwright)
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/frontend
+cd /capitalOffer/base-app/src/frontend
 
 # Install Playwright browsers
 npx playwright install
