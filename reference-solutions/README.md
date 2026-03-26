@@ -1,14 +1,14 @@
 # capitalOffer - Full Stack Application
 
-A complete full-stack loan offer platform built with Django 4.2 (Python 3.11), Vue 3, Bootstrap 5, and PostgreSQL 14.
+A complete full-stack loan offer platform built with Django 4.2 (Python 3.13), Vue 3, Bootstrap 5, and PostgreSQL 14.
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- **Python 3.11** (Install using Homebrew if needed):
+- **Python 3.13** (Install using Homebrew if needed):
   ```bash
-  brew install python@3.11
+  brew install python@3.13
   ```
 
 - **npm** (Node.js)
@@ -20,17 +20,17 @@ A complete full-stack loan offer platform built with Django 4.2 (Python 3.11), V
 #### 1. Backend Setup
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/backend
+cd /capitalOffer/base-app/src/backend
 
-# Fix Homebrew permissions (if needed for Python 3.11)
-sudo chown -R jane /opt/homebrew /opt/homebrew/share/zsh /opt/homebrew/share/zsh/site-functions /opt/homebrew/var/homebrew/locks
+# Fix Homebrew permissions (if needed for Python 3.13)
+sudo chown -R michael /opt/homebrew /opt/homebrew/share/zsh /opt/homebrew/share/zsh/site-functions /opt/homebrew/var/homebrew/locks
 chmod u+w /opt/homebrew /opt/homebrew/share/zsh /opt/homebrew/share/zsh/site-functions /opt/homebrew/var/homebrew/locks
 
-# Install Python 3.11 (if not already installed)
-brew install python@3.11
+# Install Python 3.13 (if not already installed)
+brew install python@3.13
 
-# Create virtual environment with Python 3.11
-python3.11 -m venv venv
+# Create virtual environment with Python 3.13
+python3.13 -m venv venv
 source venv/bin/activate
 
 # Install dependencies
@@ -58,7 +58,7 @@ python manage.py runserver 0.0.0.0:3000
 
 ```bash
 # Navigate to base-app directory
-cd /Users/jane/Desktop/capitalOffer/base-app
+cd /capitalOffer/base-app
 
 # Start PostgreSQL and Redis containers
 docker-compose up -d db redis
@@ -73,7 +73,7 @@ docker-compose logs -f db
 #### 3. Frontend Setup
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/frontend
+cd /capitalOffer/base-app/src/frontend
 
 # Install dependencies
 npm install
@@ -88,7 +88,7 @@ npm run dev
 
 ```bash
 # Start all services (PostgreSQL, Redis, Backend, Frontend)
-cd /Users/jane/Desktop/capitalOffer/base-app
+cd /capitalOffer/base-app
 docker-compose up
 
 # Start in background (detached mode)
@@ -109,7 +109,7 @@ docker-compose down -v
 #### Backend (Django)
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/backend
+cd /capitalOffer/base-app/src/backend
 source venv/bin/activate
 python manage.py runserver 0.0.0.0:3000
 ```
@@ -125,7 +125,7 @@ The backend API will be available at **http://localhost:3000**
 ### Frontend (Vue 3)
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/frontend
+cd /capitalOffer/base-app/src/frontend
 npm run dev
 ```
 
@@ -192,7 +192,7 @@ DB_PASSWORD=postgres
 ### Backend Tests
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/backend
+cd /capitalOffer/base-app/src/backend
 source venv/bin/activate
 python manage.py test
 ```
@@ -200,7 +200,7 @@ python manage.py test
 ### Frontend Tests
 
 ```bash
-cd /Users/jane/Desktop/capitalOffer/base-app/src/frontend
+cd /capitalOffer/base-app/src/frontend
 npm run test
 ```
 
@@ -217,59 +217,3 @@ docker-compose down
 docker-compose logs -f
 ```
 
-## 🆘 Troubleshooting
-
-### Common Issues
-
-1. **Permission errors with Homebrew**:
-   ```bash
-   sudo chown -R jane /opt/homebrew /opt/homebrew/share/zsh /opt/homebrew/share/zsh/site-functions /opt/homebrew/var/homebrew/locks
-   chmod u+w /opt/homebrew /opt/homebrew/share/zsh /opt/homebrew/share/zsh/site-functions /opt/homebrew/var/homebrew/locks
-   ```
-
-2. **Port already in use**:
-   ```bash
-   # Kill process on port 3000
-   lsof -ti:3000 | xargs kill -9
-   
-   # Kill process on port 5173
-   lsof -ti:5173 | xargs kill -9
-   ```
-
-3. **PostgreSQL Docker setup**:
-   ```bash
-   # Start PostgreSQL container via Docker
-   docker run -d \
-     --name capitaloffer-db \
-     -e POSTGRES_DB=capitaloffer \
-     -e POSTGRES_USER=postgres \
-     -e POSTGRES_PASSWORD=postgres \
-     -p 5432:5432 \
-     postgres:14
-   
-   # Check container status
-   docker ps | grep capitaloffer-db
-   
-   # View container logs
-   docker logs capitaloffer-db
-   ```
-
-4. **Database connection errors**:
-   ```bash
-   # Verify PostgreSQL Docker container is running
-   docker ps | grep postgres
-   
-   # Test connection to Docker PostgreSQL
-   docker exec -it capitaloffer-db psql -U postgres -c "SELECT version();"
-   
-   # Run migrations after database setup
-   python manage.py migrate
-   ```
-
-## 📄 License
-
-This project is proprietary and confidential.
-
-## 📞 Support
-
-For issues or questions, please contact the development team.

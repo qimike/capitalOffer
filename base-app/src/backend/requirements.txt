@@ -1,8 +1,8 @@
-Django==4.2.14
-djangorestframework==3.14.0
-djangorestframework-simplejwt==5.3.1
-psycopg[binary]==3.2.10
-python-decouple==3.8
-whitenoise==6.6.0
-django-cors-headers==4.3.1
-gunicorn==21.2.0
+Django>=5.0,<6.0
+djangorestframework>=3.15.0
+djangorestframework-simplejwt>=5.4.0
+psycopg[binary]>=3.2.0
+python-decouple>=3.8
+whitenoise>=6.7.0
+django-cors-headers>=4.4.0
+gunicorn>=22.0.0
