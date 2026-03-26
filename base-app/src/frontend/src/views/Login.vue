@@ -20,6 +20,7 @@
                       type="text"
                       class="form-control"
                       id="username"
+                      name="username"
                       v-model="username"
                       placeholder="Enter your username"
                       required
@@ -39,6 +40,7 @@
                     <input
                       type="password"
                       class="form-control"
+                      name="password"
                       id="password"
                       v-model="password"
                       required
