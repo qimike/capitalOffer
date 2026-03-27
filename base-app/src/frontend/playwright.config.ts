@@ -4,10 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright configuration for frontend testing
  */
 export default defineConfig({
-  testDir: './tests/e2e',
-  
-  /* Ignore test files from evaluation/private-test-cases and other non-standard test directories */
-  testIgnore: '**/evaluation/**',
+  testDir: './tests/base-tests',
 
   /* Run tests in files in parallel */
   fullyParallel: true,
