@@ -1,0 +1,21 @@
+{
+  "task_id": "task-7",
+  "difficulty": "medium",
+  "description": "Sort offers using dropdown",
+  "branch": "task-7",
+  "test_case_location": [
+    "tasks/test-cases/task-7/public/task-7.spec.ts",
+    "evaluation/private-test-cases/task-7/private-task-7.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user.",
+    "Navigate to '/offers'.",
+    "Locate the 'Sort By' dropdown.",
+    "Select 'Lowest Interest Rate'.",
+    "Verify offers are sorted ascending by interest rate.",
+    "Select 'Highest Loan Amount'.",
+    "Verify offers are sorted descending by amount.",
+    "Select 'Soonest Expiry'.",
+    "Verify offers are sorted by expiry date."
+  ]
+}

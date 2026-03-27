@@ -1,0 +1,18 @@
+{
+  "task_id": "task-5",
+  "difficulty": "medium",
+  "description": "Display monthly repayment summary panel",
+  "branch": "task-5",
+  "test_case_location": [
+    "tasks/test-cases/task-5/public/task-5.spec.ts",
+    "evaluation/private-test-cases/task-5/private-task-5.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user.",
+    "Navigate to an offer detail page.",
+    "Locate the repayment summary panel.",
+    "Verify monthly payment is displayed.",
+    "Verify total repayment amount is displayed.",
+    "Verify total interest is calculated correctly."
+  ]
+}

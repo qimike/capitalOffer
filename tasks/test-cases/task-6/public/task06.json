@@ -1,0 +1,19 @@
+{
+  "task_id": "task-6",
+  "difficulty": "medium",
+  "description": "Shortlist an offer",
+  "branch": "task-6",
+  "test_case_location": [
+    "tasks/test-cases/task-6/public/task-6.spec.ts",
+    "evaluation/private-test-cases/task-6/private-task-6.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user.",
+    "Navigate to '/offers'.",
+    "Click the shortlist (bookmark) icon on an offer.",
+    "Verify the offer is added to shortlist.",
+    "Navigate to '/shortlist'.",
+    "Verify the offer appears in the shortlist page.",
+    "Remove the offer from shortlist and verify it disappears."
+  ]
+}

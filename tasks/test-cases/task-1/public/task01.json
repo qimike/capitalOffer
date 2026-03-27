@@ -1,0 +1,19 @@
+{
+  "task_id": "task-1",
+  "difficulty": "easy",
+  "description": "Display offer list page with status badges",
+  "branch": "task-1",
+  "test_case_location": [
+    "tasks/test-cases/task-1/public/task-1.spec.ts",
+    "evaluation/private-test-cases/task-1/private-task-1.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user (e.g., demo@verityehr.com).",
+    "Navigate to '/offers'.",
+    "Verify that a list of offers is displayed.",
+    "Each offer card shows lender name, loan amount, interest rate, and term.",
+    "Each offer displays a status badge (e.g., pending, approved, expired).",
+    "Verify pagination controls exist at the bottom.",
+    "Click 'Next' to navigate to the next page of results."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "task_id": "task-4",
+  "difficulty": "easy",
+  "description": "Edit borrower profile",
+  "branch": "task-4",
+  "test_case_location": [
+    "tasks/test-cases/task-4/public/task-4.spec.ts",
+    "evaluation/private-test-cases/task-4/private-task-4.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user.",
+    "Navigate to '/profile'.",
+    "Click 'Edit Profile'.",
+    "Update full name and phone number.",
+    "Click 'Save'.",
+    "Verify the updated values are displayed.",
+    "Refresh the page and verify changes persist."
+  ]
+}

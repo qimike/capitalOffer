@@ -1,0 +1,18 @@
+{
+  "task_id": "task-9",
+  "difficulty": "hard",
+  "description": "Display eligibility label on offers",
+  "branch": "task-9",
+  "test_case_location": [
+    "tasks/test-cases/task-9/public/task-9.spec.ts",
+    "evaluation/private-test-cases/task-9/private-task-9.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user.",
+    "Navigate to '/offers'.",
+    "Verify each offer displays an eligibility label (Good Fit, Possible, Unlikely).",
+    "Navigate to offer detail page.",
+    "Verify eligibility label is also displayed there.",
+    "Update profile data and verify eligibility labels update accordingly."
+  ]
+}

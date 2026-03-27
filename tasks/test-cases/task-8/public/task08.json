@@ -1,0 +1,21 @@
+{
+  "task_id": "task-8",
+  "difficulty": "hard",
+  "description": "Accept or decline an offer",
+  "branch": "task-8",
+  "test_case_location": [
+    "tasks/test-cases/task-8/public/task-8.spec.ts",
+    "evaluation/private-test-cases/task-8/private-task-8.spec.ts"
+  ],
+  "acceptance_criteria": [
+    "Log in as a user.",
+    "Navigate to an offer detail page.",
+    "Click 'Accept Offer'.",
+    "Verify the offer status updates to 'accepted'.",
+    "Verify other offers are marked as 'expired'.",
+    "Navigate to another offer.",
+    "Click 'Decline Offer'.",
+    "Enter a decline reason.",
+    "Verify the offer status updates to 'declined'."
+  ]
+}
