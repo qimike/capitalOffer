@@ -110,26 +110,40 @@
     </div>
 
     <!-- Pagination -->
-    <div v-if="!loading && offers.length > 0" class="d-flex justify-content-center align-items-center mt-4">
+    <div v-if="!loading && totalCount > limit" class="d-flex justify-content-center align-items-center mt-4">
       <nav>
         <ul class="pagination mb-0">
           <li class="page-item" :class="{ disabled: currentPage === 1 }">
-            <a class="page-link" href="#" @click.prevent="currentPage = currentPage - 1">Previous</a>
+            <button class="page-link" @click="goToPage(currentPage - 1)" :disabled="currentPage === 1">Previous</button>
+          </li>
+          <li class="page-item" :class="{ active: currentPage === 1 }">
+            <button class="page-link" @click="goToPage(1)" :disabled="currentPage === 1">1</button>
+          </li>
+          <li v-for="pageNum in middlePages" 
+              :key="pageNum"
+              class="page-item"
+              :class="{ active: currentPage === pageNum }">
+            <button class="page-link" @click="goToPage(pageNum)" :disabled="currentPage === pageNum">{{ pageNum }}</button>
+          </li>
+          <li v-if="totalPages > 1" 
+              class="page-item" 
+              :class="{ active: currentPage === totalPages }">
+            <button class="page-link" @click="goToPage(totalPages)" :disabled="currentPage === totalPages">{{ totalPages }}</button>
           </li>
           <li class="page-item" :class="{ disabled: currentPage >= totalPages }">
-            <a class="page-link" href="#" @click.prevent="currentPage = currentPage + 1">Next</a>
+            <button class="page-link" @click="goToPage(currentPage + 1)" :disabled="currentPage >= totalPages">Next</button>
           </li>
         </ul>
       </nav>
       <small class="text-muted ms-3" style="line-height: 1.5;">
-        Page {{ currentPage }} of {{ totalPages }}
+        Page {{ currentPage }} of {{ totalPages }} ({{ totalCount }} offers total)
       </small>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -138,7 +152,7 @@ const searchQuery = ref('')
 const filterStatus = ref('')
 const sortBy = ref('amount_desc')
 const currentPage = ref(1)
-const limit = ref(10)
+const limit = ref(6) // Show 6 offers per page
 const totalCount = ref(0)
 
 const totalPages = computed(() => {
@@ -147,6 +161,26 @@ const totalPages = computed(() => {
 
 const hasFilters = computed(() => {
   return filterStatus.value !== '' || searchQuery.value !== ''
+})
+
+// Get page numbers to display (excluding first and last which are handled separately)
+const middlePages = computed(() => {
+  const pages = []
+  for (let i = 2; i < totalPages.value; i++) {
+    pages.push(i)
+  }
+  return pages
+})
+
+// Watch for page changes and refetch
+watch(currentPage, () => {
+  fetchOffers()
+})
+
+// Watch for filter changes and reset to page 1
+watch([filterStatus, searchQuery, sortBy], () => {
+  currentPage.value = 1
+  fetchOffers()
 })
 
 onMounted(() => {
@@ -170,23 +204,28 @@ const fetchOffers = async () => {
     // Handle DRF pagination response format
     if (data && data.results) {
       offers.value = data.results
-      console.log('Offers extracted from results:', offers.value.length)
+      totalCount.value = data.count || 0
+      console.log('Offers extracted from results:', offers.value.length, 'Total:', totalCount.value)
     } else if (Array.isArray(data)) {
       offers.value = data
+      totalCount.value = data.length
       console.log('Offers is array:', offers.value.length)
     } else if (data && data.offers) {
       offers.value = data.offers
+      totalCount.value = data.total_count || data.offers.length
       console.log('Offers extracted from data.offers:', offers.value.length)
     } else {
       offers.value = []
+      totalCount.value = 0
       console.log('No offers found in response')
     }
   } catch (err) {
     console.error('Error fetching offers:', err)
     offers.value = []
+    totalCount.value = 0
   } finally {
     loading.value = false
-    console.log('Final offers count:', offers.value.length)
+    console.log('Final offers count:', offers.value.length, 'Total pages:', totalPages.value)
   }
 }
 
@@ -200,11 +239,20 @@ const statusBadgeClass = (status) => {
   return classes[status] || 'bg-secondary'
 }
 
+const goToPage = (page) => {
+  if (page >= 1 && page <= totalPages.value) {
+    currentPage.value = page
+    // Scroll to top of offers list
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
 const resetFilters = () => {
   filterStatus.value = ''
   sortBy.value = 'amount_desc'
   searchQuery.value = ''
   currentPage.value = 1
+  fetchOffers()
 }
 </script>
 
@@ -221,10 +269,35 @@ const resetFilters = () => {
 
 .page-link {
   color: #0d6efd;
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  cursor: pointer;
+  padding: 0.375rem 0.75rem;
+}
+
+.page-link:hover {
+  background-color: #e7f5ff;
+  border-color: #4dabf7;
+  color: #0d6efd;
 }
 
 .page-item.active .page-link {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: #4dabf7;
+  border-color: #4dabf7;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: default;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  cursor: not-allowed;
+}
+
+.page-link:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
 }
 </style>

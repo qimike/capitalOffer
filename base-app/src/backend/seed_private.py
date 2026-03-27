@@ -45,7 +45,6 @@ private_users = [
     }
 ]
 
-users = []
 for user_data in private_users:
     user, created = User.objects.get_or_create(
         username=user_data['username'],
@@ -57,69 +56,56 @@ for user_data in private_users:
         print(f"  Created user: {user.username} (password: test@123)")
     else:
         print(f"  User already exists: {user.username}")
-    users.append(user)
 
-# Create 10 offers for each private user
+# Create offers for the private users
 print("\nCreating private offers...")
 offer_templates = [
     {"amount": 20000, "rate": 5.5, "apr": 5.8, "term": 36, "fee": 100, "status": "new"},
     {"amount": 30000, "rate": 6.5, "apr": 6.8, "term": 48, "fee": 150, "status": "accepted"},
     {"amount": 50000, "rate": 4.9, "apr": 5.2, "term": 60, "fee": 200, "status": "expired"},
     {"amount": 15000, "rate": 7.5, "apr": 7.8, "term": 24, "fee": 75, "status": "new"},
-    {"amount": 25000, "rate": 6.0, "apr": 6.3, "term": 36, "fee": 125, "status": "new"},
-    {"amount": 40000, "rate": 5.2, "apr": 5.5, "term": 48, "fee": 200, "status": "pending"},
-    {"amount": 18000, "rate": 6.8, "apr": 7.1, "term": 24, "fee": 90, "status": "new"},
-    {"amount": 35000, "rate": 5.8, "apr": 6.1, "term": 60, "fee": 175, "status": "new"},
-    {"amount": 28000, "rate": 6.2, "apr": 6.5, "term": 36, "fee": 140, "status": "accepted"},
-    {"amount": 22000, "rate": 5.9, "apr": 6.2, "term": 48, "fee": 110, "status": "new"},
 ]
 
-lenders_list = list(Lender.objects.filter(slug__in=['privatelend', 'elitecapital', 'premierfinance']))
-
-for user in users:
-    print(f"\n  Creating 10 offers for {user.username}...")
+for user in User.objects.filter(username__in=['jane', 'tina']):
+    print(f"\nCreating offers for user: {user.username}")
+    
     for i, offer_data in enumerate(offer_templates):
-        # Cycle through lenders
-        lender = lenders_list[i % len(lenders_list)]
-        
-        loan_amount = offer_data['amount']
-        interest_rate = offer_data['rate']
-        apr = offer_data['apr']
-        term_months = offer_data['term']
-        origination_fee = offer_data['fee']
-        status = offer_data['status']
-        
-        # Calculate monthly payment
-        monthly_payment = loan_amount * (interest_rate / 100 / 12) / (1 - (1 + interest_rate / 100 / 12) ** -term_months)
-        
-        # Set expiry date based on status
-        if status == 'new':
-            expiry_date = datetime.datetime.now() + datetime.timedelta(days=30)
-        elif status == 'accepted':
-            expiry_date = datetime.datetime.now() + datetime.timedelta(days=60)
-        elif status == 'expired':
-            expiry_date = datetime.datetime.now() - datetime.timedelta(days=10)
-        else:
-            expiry_date = datetime.datetime.now() + datetime.timedelta(days=15)
-        
-        offer = Offer.objects.create(
-            user=user,
-            lender=lender,
-            loan_amount=loan_amount,
-            interest_rate=interest_rate,
-            apr=apr,
-            term_months=term_months,
-            origination_fee=origination_fee,
-            monthly_payment=round(monthly_payment, 2),
-            status=status,
-            expiry_date=expiry_date
-        )
-        print(f"    Created offer {i+1}: ${loan_amount} from {lender.name} ({status})")
+        for j, lender in enumerate(Lender.objects.filter(slug__in=['privatelend', 'elitecapital', 'premierfinance'])):
+            loan_amount = offer_data['amount']
+            interest_rate = offer_data['rate']
+            apr = offer_data['apr']
+            term_months = offer_data['term']
+            origination_fee = offer_data['fee']
+            status = offer_data['status']
+            
+            # Calculate monthly payment
+            monthly_payment = loan_amount * (interest_rate / 100 / 12) / (1 - (1 + interest_rate / 100 / 12) ** -term_months)
+            
+            # Set expiry date based on status
+            if status == 'new':
+                expiry_date = datetime.datetime.now() + datetime.timedelta(days=30)
+            elif status == 'accepted':
+                expiry_date = datetime.datetime.now() - datetime.timedelta(days=60)
+            elif status == 'expired':
+                expiry_date = datetime.datetime.now() - datetime.timedelta(days=10)
+            else:
+                expiry_date = datetime.datetime.now() + datetime.timedelta(days=15)
+            
+            offer = Offer.objects.create(
+                user=user,
+                lender=lender,
+                loan_amount=loan_amount,
+                interest_rate=interest_rate,
+                apr=apr,
+                term_months=term_months,
+                origination_fee=origination_fee,
+                monthly_payment=round(monthly_payment, 2),
+                status=status,
+                expiry_date=expiry_date
+            )
+            print(f"  Created offer: ${loan_amount} from {lender.name} (status: {status})")
 
-print(f"\n✅ Private seed data created successfully!")
-print(f"\nTotal offers in database: {Offer.objects.count()}")
-print(f"Jane's offers: {Offer.objects.filter(user=users[0]).count()}")
-print(f"Tina's offers: {Offer.objects.filter(user=users[1]).count()}")
+print("\n✅ Private seed data created successfully!")
 print("\nPrivate test user credentials:")
 print("  Username: jane")
 print("  Password: test@123")
