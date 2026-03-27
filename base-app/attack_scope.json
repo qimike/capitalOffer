@@ -2,6 +2,10 @@
   "application": "CapitalOffer",
   "version": "1.0.0",
   "description": "Personal loan offer comparison platform - attack surface and vulnerability vectors",
+  "privilege_escalation": {
+    "is_django_based": true,
+    "admin_user_ids": [1, 2]
+  },
   "vectors": [
     {
       "id": "SQL_INJECTION",

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # docker-entrypoint.sh for Django backend
 # This script handles database migrations, seeding, and running the server
@@ -9,19 +9,36 @@ echo "=========================================="
 echo "Django Backend Startup Script"
 echo "=========================================="
 
-# Wait for PostgreSQL to be ready
-echo "Waiting for PostgreSQL to be ready..."
-while ! nc -z db 5432; do
-  sleep 0.5
+# REQUIRED: Wait for database with timeout
+max_attempts=30
+attempt=1
+DB_HOST=${DB_HOST:-localhost}
+
+while ! nc -z $DB_HOST 5432; do
+  if [ $attempt -eq $max_attempts ]; then
+    echo "❌ Database timeout"
+    exit 1
+  fi
+  echo "Attempt $attempt/$max_attempts: waiting..."
+  sleep 2
+  attempt=$((attempt + 1))
 done
-echo "PostgreSQL is ready!"
+echo "✅ Database ready!"
 
 # Wait for Redis to be ready
-echo "Waiting for Redis to be ready..."
-while ! nc -z redis 6379; do
-  sleep 0.5
+attempt=1
+REDIS_HOST=${REDIS_HOST:-localhost}
+
+while ! nc -z $REDIS_HOST 6379; do
+  if [ $attempt -eq $max_attempts ]; then
+    echo "❌ Redis timeout"
+    exit 1
+  fi
+  echo "Attempt $attempt/$max_attempts: waiting for Redis..."
+  sleep 2
+  attempt=$((attempt + 1))
 done
-echo "Redis is ready!"
+echo "✅ Redis ready!"
 
 echo "Running database migrations..."
 python manage.py migrate --noinput
@@ -30,7 +47,8 @@ python manage.py migrate --noinput
 echo "Checking if database needs seeding..."
 if ! python -c "from app.models import Offer; import sys; sys.exit(0 if Offer.objects.count() > 0 else 1)" 2>/dev/null; then
   echo "Database is empty, seeding data..."
-  python seed_offers.py
+  python seed_public.py
+  python seed_private.py
 else
   echo "Database already has data, skipping seeding."
 fi
