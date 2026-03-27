@@ -1,8 +1,8 @@
-FROM node:24-alpine
-
+# Multi-stage build
+FROM node:24-alpine AS builder
 WORKDIR /app
 
-# Install dependencies first for better caching
+# Copy package files first for better caching
 COPY package*.json ./
 
 RUN npm install
@@ -10,7 +10,20 @@ RUN npm install
 # Copy application code
 COPY . .
 
-# Expose port and run dev server
-EXPOSE 5173
+# Production build
+RUN npm run build
 
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
+# Production stage with Nginx
+FROM nginx:alpine
+
+# Copy built assets from builder
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Expose port
+EXPOSE 80
+
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]

@@ -34,14 +34,17 @@ for lender_data in lenders:
 # Create a test user
 print("\nCreating test user...")
 test_user, created = User.objects.get_or_create(
-    username='testuser',
-    email='test@example.com'
+    username='alice',
+    defaults={
+        'email': 'alice@capitaloffer.com',
+        'first_name': 'Alice',
+        'last_name': 'User',
+    }
 )
 if created:
-    test_user.set_password('testpass123')
-    test_user.full_name = 'Test User'
+    test_user.set_password('test@123')
     test_user.save()
-    print(f"  Created user: testuser (password: testpass123)")
+    print(f"  Created user: alice (password: test@123)")
 else:
     print("  User already exists")
 
@@ -94,6 +97,6 @@ for i, offer_data in enumerate(offer_templates):
 
 print("\n✅ Seed data created successfully!")
 print("\nTest user credentials:")
-print("  Username: testuser")
-print("  Password: testpass123")
+print("  Username: alice")
+print("  Password: test@123")
 print("\nYou can now login at http://localhost:3000/api/auth/login/")

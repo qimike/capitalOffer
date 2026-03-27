@@ -35,18 +35,9 @@ else
   echo "Database already has data, skipping seeding."
 fi
 
-echo "Collecting static files..."
-python manage.py collectstatic --noinput
-
 echo "=========================================="
-echo "Starting Server"
+echo "Starting Django Development Server"
 echo "=========================================="
 
-# Use gunicorn in production, dev server in development
-if [ "$DEBUG" = "0" ] || [ "$DEBUG" = "False" ] || [ "$DEBUG" = "false" ]; then
-  echo "Starting Gunicorn (production mode)..."
-  exec gunicorn app.wsgi:application --bind 0.0.0.0:3000 --workers 3 --timeout 120
-else
-  echo "Starting Django Development Server..."
-  exec python manage.py runserver 0.0.0.0:3000
-fi
+# Run the development server
+exec python manage.py runserver 0.0.0.0:3000

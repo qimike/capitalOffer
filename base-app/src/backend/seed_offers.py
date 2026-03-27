@@ -57,7 +57,14 @@ def create_user(username, email, password, first_name, last_name, phone):
         user.save()
         print(f"  ✅ Created user: {user.username} (password: {password})")
     else:
-        print(f"  📦 User exists: {user.username}")
+        # Always update password and fields for existing users
+        user.set_password(password)
+        user.email = email
+        user.first_name = first_name
+        user.last_name = last_name
+        user.phone = phone
+        user.save()
+        print(f"  📦 User exists (updated): {user.username} (password: {password})")
     return user
 
 def create_offer(user, lender_id, amount, rate, apr, term, fee, status):
@@ -164,7 +171,7 @@ for i, username in enumerate(usernames_public):
     user = create_user(
         username=username,
         email=f'{username}@capitaloffer.com',
-        password='private@456',
+        password='test@123',
         first_name=first_names[i],
         last_name='User',
         phone='555-0100'
@@ -241,8 +248,8 @@ first_names_private = ['Jane', 'Tina']
 for i, username in enumerate(usernames_private):
     user = create_user(
         username=username,
-        email='test@gmail.com',
-        password='test@123',
+        email=f'{username}@capitaloffer.com',
+        password='private@456',
         first_name=first_names_private[i],
         last_name='User',
         phone='555-0200'
@@ -307,7 +314,7 @@ print("\n🔐 TEST CREDENTIALS:")
 print("\nPublic Users:")
 for username in ['alice', 'mike']:
     print(f"  Username: {username}")
-    print(f"  Email: test@gmail.com")
+    print(f"  Email: {username}@capitaloffer.com")
     print(f"  Password: test@123")
 
 print("\nPrivate Users:")
