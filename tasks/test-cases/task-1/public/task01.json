@@ -8,11 +8,11 @@
     "evaluation/private-test-cases/task-1/private-task-1.spec.ts"
   ],
   "acceptance_criteria": [
-    "Log in as a user (e.g., demo@verityehr.com).",
+    "Log in as a user (e.g., alice@capitaloffer.com).",
     "Navigate to '/offers'.",
     "Verify that a list of offers is displayed.",
     "Each offer card shows lender name, loan amount, interest rate, and term.",
-    "Each offer displays a status badge (e.g., pending, approved, expired).",
+    "Each offer displays a status badge (e.g., new, pending, accepted, expired).",
     "Verify pagination controls exist at the bottom.",
     "Click 'Next' to navigate to the next page of results."
   ]
