@@ -79,13 +79,6 @@ offer_templates = [
 
 lenders_list = list(Lender.objects.all()[:3])  # Use first 3 lenders
 
-# Sample lender notes for different lenders
-lender_notes = {
-    'capitalone': 'Competitive rates for borrowers with excellent credit. Pre-approval available within 24 hours.',
-    'sofi': 'No hidden fees or origination charges for qualified applicants. Flexible repayment options available.',
-    'lendingclub': 'Peer-to-peer funding allows for competitive rates. Funds typically available within 7-14 business days.',
-}
-
 for user in users:
     print(f"\n  Creating 10 offers for {user.username}...")
     for i, offer_data in enumerate(offer_templates):
@@ -98,9 +91,6 @@ for user in users:
         term_months = offer_data['term']
         origination_fee = offer_data['fee']
         status = offer_data['status']
-        
-        # Get lender-specific notes
-        lender_note = lender_notes.get(lender.slug, 'Standard loan offer terms apply.')
         
         # Calculate monthly payment
         monthly_payment = loan_amount * (interest_rate / 100 / 12) / (1 - (1 + interest_rate / 100 / 12) ** -term_months)
@@ -125,8 +115,7 @@ for user in users:
             origination_fee=origination_fee,
             monthly_payment=round(monthly_payment, 2),
             status=status,
-            expiry_date=expiry_date,
-            lender_notes=lender_note
+            expiry_date=expiry_date
         )
         print(f"    Created offer {i+1}: ${loan_amount} from {lender.name} ({status})")
 
