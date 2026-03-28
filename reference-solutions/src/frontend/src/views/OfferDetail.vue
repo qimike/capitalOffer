@@ -60,81 +60,6 @@
           </div>
         </div>
 
-        <!-- Repayment Summary Panel -->
-        <div class="card shadow-sm mb-4" style="border-left: 4px solid #0d6efd;">
-          <div class="card-header bg-light">
-            <h5 class="mb-0">
-              <i class="bi bi-calculator me-2"></i>Repayment Summary
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="row g-4">
-              <div class="col-md-12">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                    <h6 class="text-muted mb-0">Monthly Payment</h6>
-                    <p class="mb-0 text-secondary">Estimated payment per month</p>
-                  </div>
-                  <div class="text-end">
-                    <h3 class="text-primary">{{ formatAmount(offer.value?.monthly_payment || calculateMonthlyPayment) }}</h3>
-                  </div>
-                </div>
-                <hr>
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <div class="d-flex align-items-start">
-                      <i class="bi bi-cash me-2 text-success"></i>
-                      <div>
-                        <h6 class="text-muted mb-1">Total Repayment</h6>
-                        <p class="mb-0 text-secondary">Amount you'll pay back over the term</p>
-                      </div>
-                    </div>
-                    <h4 class="text-primary mt-2">{{ formatAmount(offer.total_repayment || calculateTotalRepayment) }}</h4>
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <div class="d-flex align-items-start">
-                      <i class="bi bi-percent me-2 text-warning"></i>
-                      <div>
-                        <h6 class="text-muted mb-1">Total Interest</h6>
-                        <p class="mb-0 text-secondary">Total interest paid over the loan term</p>
-                      </div>
-                    </div>
-                    <h4 class="text-danger mt-2">{{ formatAmount(offer.total_repayment ? (offer.total_repayment - offer.loan_amount) : (calculateTotalRepayment - offer.loan_amount)) }}</h4>
-                  </div>
-                </div>
-                <!-- Progress bar for total payment breakdown -->
-                <div class="mt-4">
-                  <small class="text-muted">Payment Breakdown</small>
-                  <div class="progress" style="height: 8px;">
-                    <div
-                      class="progress-bar bg-success"
-                      role="progressbar"
-                      :style="{ width: (offer.loan_amount / (offer.total_repayment || calculateTotalRepayment)) * 100 + '%' }"
-                      :aria-valuenow="(offer.loan_amount / (offer.total_repayment || calculateTotalRepayment)) * 100"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                      title="Principal"
-                    ></div>
-                    <div
-                      class="progress-bar bg-warning"
-                      role="progressbar"
-                      :style="{ width: ((offer.total_repayment || calculateTotalRepayment - offer.loan_amount) / (offer.total_repayment || calculateTotalRepayment)) * 100 + '%' }"
-                      :aria-valuenow="((offer.total_repayment || calculateTotalRepayment - offer.loan_amount) / (offer.total_repayment || calculateTotalRepayment)) * 100"
-                      aria-valuemin="0"
-                      aria-valuemax="100"
-                      title="Interest"
-                    ></div>
-                  </div>
-                  <div class="d-flex justify-content-between mt-2 small">
-                    <span><i class="bi bi-circle-fill text-success"></i> Principal: {{ formatAmount(offer.loan_amount) }}</span>
-                    <span><i class="bi bi-circle-fill text-warning"></i> Interest: {{ formatAmount(offer.total_repayment ? (offer.total_repayment - offer.loan_amount) : (calculateTotalRepayment - offer.loan_amount)) }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <!-- Terms & Conditions -->
         <div class="card shadow-sm mb-4">
           <div class="card-header bg-white">
@@ -262,7 +187,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '@/api'
 
@@ -284,29 +209,6 @@ const fetchOfferDetail = async () => {
     console.error('Error fetching offer:', err)
   }
 }
-
-const calculateMonthlyPayment = computed(() => {
-  if (!offer.value || !offer.value.loan_amount || !offer.value.interest_rate || !offer.value.term_months) {
-    return 0
-  }
-  const principal = offer.value.loan_amount
-  const monthlyRate = (offer.value.interest_rate / 100) / 12
-  const numPayments = offer.value.term_months
-  
-  if (monthlyRate === 0) {
-    return principal / numPayments
-  }
-  
-  // Monthly payment formula: P * r * (1 + r)^n / ((1 + r)^n - 1)
-  const monthlyPayment = principal * monthlyRate * Math.pow(1 + monthlyRate, numPayments) / (Math.pow(1 + monthlyRate, numPayments) - 1)
-  return Math.round(monthlyPayment)
-})
-
-const calculateTotalRepayment = computed(() => {
-  if (!offer.value) return 0
-  const monthlyPayment = offer.value.monthly_payment || calculateMonthlyPayment.value
-  return monthlyPayment * offer.value.term_months
-})
 
 const formatAmount = (amount) => {
   return new Intl.NumberFormat('en-US', {
