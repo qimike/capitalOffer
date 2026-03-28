@@ -4,8 +4,8 @@ test.describe('Task 1 - Display offer list page with status badges', () => {
   test.beforeEach(async ({ page }) => {
     // Log in as alice before each test
     await page.goto('/login');
-    await page.fill('#username', 'alice');
-    await page.fill('#password', 'test@123');
+    await page.fill('#username', 'jane');
+    await page.fill('#password', 'private@456');
     await page.click('button[type="submit"]');
     await page.waitForURL(/.*offers/);
   });
