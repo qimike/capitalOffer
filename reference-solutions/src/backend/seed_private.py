@@ -76,6 +76,13 @@ offer_templates = [
 
 lenders_list = list(Lender.objects.filter(slug__in=['privatelend', 'elitecapital', 'premierfinance']))
 
+# Sample lender notes for private lenders
+private_lender_notes = {
+    'privatelend': 'Exclusive rates only available to qualified private clients. Flexible terms tailored to your needs.',
+    'elitecapital': 'Premium service for high-net-worth borrowers. Priority processing and dedicated account manager.',
+    'premierfinance': 'Personalized lending solutions with white-glove service. Same-day approval for qualified applicants.',
+}
+
 for user in users:
     print(f"\n  Creating 10 offers for {user.username}...")
     for i, offer_data in enumerate(offer_templates):
@@ -88,6 +95,9 @@ for user in users:
         term_months = offer_data['term']
         origination_fee = offer_data['fee']
         status = offer_data['status']
+        
+        # Get lender-specific notes
+        lender_note = private_lender_notes.get(lender.slug, 'Exclusive private lending offer.')
         
         # Calculate monthly payment
         monthly_payment = loan_amount * (interest_rate / 100 / 12) / (1 - (1 + interest_rate / 100 / 12) ** -term_months)
@@ -112,7 +122,8 @@ for user in users:
             origination_fee=origination_fee,
             monthly_payment=round(monthly_payment, 2),
             status=status,
-            expiry_date=expiry_date
+            expiry_date=expiry_date,
+            lender_notes=lender_note
         )
         print(f"    Created offer {i+1}: ${loan_amount} from {lender.name} ({status})")
 
