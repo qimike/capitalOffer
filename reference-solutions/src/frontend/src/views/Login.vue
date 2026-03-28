@@ -139,12 +139,8 @@ const handleLogin = async () => {
               localStorage.setItem('refreshToken', data.refresh)
               localStorage.setItem('isAuthenticated', 'true')
               localStorage.setItem('userId', data.user.id)
-              // Store username for display (will be updated from profile if full_name exists)
-              if (data.user.full_name) {
-                localStorage.setItem('userName', data.user.full_name)
-              } else {
-                localStorage.setItem('userName', data.user.username)
-              }
+              // Store username directly for display
+              localStorage.setItem('userName', data.user.username)
 
               // Redirect to intended page or offers
               const redirect = route.query.redirect || '/offers'
