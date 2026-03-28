@@ -1,8 +1,21 @@
 <template>
   <div class="profile-container" style="padding-top: 80px;">
-    <h2 class="mb-4">
-      <i class="bi bi-person-circle me-2"></i>My Profile
-    </h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2>
+        <i class="bi bi-person-circle me-2"></i>My Profile
+      </h2>
+      <button v-if="!isEditing" class="btn btn-primary" @click="startEdit">
+        <i class="bi bi-pencil me-2"></i>Edit Profile
+      </button>
+      <div v-else>
+        <button class="btn btn-outline-secondary me-2" @click="cancelEdit">
+          Cancel
+        </button>
+        <button class="btn btn-success" @click="saveProfile">
+          <i class="bi bi-check me-2"></i>Save
+        </button>
+      </div>
+    </div>
 
     <div class="row">
       <!-- Profile Card -->
@@ -33,17 +46,35 @@
           </div>
           <div class="card-body">
             <div class="row g-3">
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="!isEditing">
                 <strong>Full Name: </strong>
                 <p class="d-inline">{{ userName }}</p>
+              </div>
+              <div class="col-md-6" v-else>
+                <strong>Full Name: </strong>
+                <input
+                  type="text"
+                  class="form-control"
+                  v-model="editForm.full_name"
+                  placeholder="Enter full name"
+                />
               </div>
               <div class="col-md-6">
                 <strong>Email: </strong>
                 <p class="d-inline">{{ userEmail }}</p>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-6" v-if="!isEditing">
                 <strong>Phone: </strong>
                 <p class="d-inline">{{ profileData?.phone || 'Not provided' }}</p>
+              </div>
+              <div class="col-md-6" v-else>
+                <strong>Phone: </strong>
+                <input
+                  type="tel"
+                  class="form-control"
+                  v-model="editForm.phone"
+                  placeholder="Enter phone number"
+                />
               </div>
               <div class="col-md-6">
                 <strong>Date of Birth: </strong>
@@ -161,6 +192,11 @@ const userName = ref(localStorage.getItem('userName') || 'User')
 const userEmail = ref('user@example.com')
 
 const profileData = ref(null)
+const isEditing = ref(false)
+const editForm = ref({
+  full_name: '',
+  phone: ''
+})
 
 // Fetch profile data from API
 onMounted(async () => {
@@ -173,10 +209,57 @@ onMounted(async () => {
     if (profileData.value.email) {
       userEmail.value = profileData.value.email
     }
+    if (profileData.value.phone) {
+      editForm.value.phone = profileData.value.phone
+    }
+    if (profileData.value.full_name) {
+      editForm.value.full_name = profileData.value.full_name
+    }
   } catch (err) {
     console.error('Error fetching profile:', err)
   }
 })
+
+const startEdit = () => {
+  isEditing.value = true
+  // Initialize edit form with current values
+  editForm.value.full_name = profileData.value?.full_name || ''
+  editForm.value.phone = profileData.value?.phone || ''
+}
+
+const cancelEdit = () => {
+  isEditing.value = false
+  // Reset edit form
+  editForm.value.full_name = profileData.value?.full_name || ''
+  editForm.value.phone = profileData.value?.phone || ''
+}
+
+const saveProfile = async () => {
+  try {
+    await api.profile.update({
+      full_name: editForm.value.full_name,
+      phone: editForm.value.phone
+    })
+    
+    // Update local state
+    if (editForm.value.full_name) {
+      userName.value = editForm.value.full_name
+      profileData.value.full_name = editForm.value.full_name
+    }
+    if (editForm.value.phone) {
+      profileData.value.phone = editForm.value.phone
+    }
+    
+    // Update localStorage with new full name
+    localStorage.setItem('userName', editForm.value.full_name)
+    
+    isEditing.value = false
+    alert('Profile updated successfully!')
+  } catch (err) {
+    console.error('Error updating profile:', err)
+    alert('Failed to update profile. Please try again.')
+  }
+}
 
 const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-US', {
