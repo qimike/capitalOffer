@@ -102,8 +102,6 @@ class OfferSerializer(serializers.ModelSerializer):
 
     def get_eligibility_label(self, obj):
         """Calculate eligibility label based on user profile and offer details."""
-        from decimal import Decimal
-        
         user = obj.user
         offer = obj
         
