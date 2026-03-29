@@ -131,7 +131,7 @@
             <div class="d-grid gap-2">
               <button
                 class="btn btn-primary btn-lg"
-                :disabled="['accepted', 'expired', 'declined'].includes(offer.status)"
+                :disabled="offer.status === 'expired'"
                 @click="acceptOffer"
               >
                 <i class="bi bi-check-circle me-2"></i>
@@ -139,7 +139,6 @@
               </button>
               <button
                 class="btn btn-outline-danger btn-lg"
-                :disabled="['declined', 'accepted', 'expired'].includes(offer.status)"
                 @click="declineOffer"
               >
                 <i class="bi bi-x-circle me-2"></i>
