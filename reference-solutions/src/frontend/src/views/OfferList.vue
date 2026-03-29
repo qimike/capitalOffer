@@ -87,12 +87,12 @@
 
             <!-- Eligibility Label -->
             <div class="mb-3">
-              <small class="text-muted">Eligibility:</small>
               <span
-                class="badge ms-2"
+                class="badge fs-6"
                 :class="eligibilityBadgeClass(offer.eligibility_label)"
               >
-                {{ offer.eligibility_label || 'Loading...' }}
+                <i :class="eligibilityIcon(offer.eligibility_label)" class="me-1"></i>
+                {{ offer.eligibility_label }}
               </span>
             </div>
 
@@ -140,7 +140,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -151,17 +151,6 @@ const sortBy = ref('amount_desc')
 const currentPage = ref(1)
 const limit = ref(10)
 const totalCount = ref(0)
-
-// Watch for changes in search, filter, or sort to reset pagination
-watch([searchQuery, filterStatus, sortBy], () => {
-  currentPage.value = 1
-  fetchOffers()
-})
-
-// Watch for pagination changes
-watch(currentPage, () => {
-  fetchOffers()
-})
 
 const totalPages = computed(() => {
   return Math.max(1, Math.ceil(totalCount.value / limit.value))
@@ -223,14 +212,21 @@ const statusBadgeClass = (status) => {
 }
 
 const eligibilityBadgeClass = (label) => {
-  if (label === 'Good Fit') {
-    return 'bg-success'
-  } else if (label === 'Possible') {
-    return 'bg-warning text-dark'
-  } else if (label === 'Unlikely') {
-    return 'bg-secondary'
+  const classes = {
+    'Good Fit': 'bg-success',
+    'Possible': 'bg-warning text-dark',
+    'Unlikely': 'bg-danger'
   }
-  return 'bg-secondary'
+  return classes[label] || 'bg-secondary'
+}
+
+const eligibilityIcon = (label) => {
+  const icons = {
+    'Good Fit': 'bi-check-circle-fill',
+    'Possible': 'bi-question-circle-fill',
+    'Unlikely': 'bi-x-circle-fill'
+  }
+  return icons[label] || 'bi-question-circle-fill'
 }
 
 const resetFilters = () => {

@@ -74,9 +74,21 @@ class OfferViewSet(viewsets.ModelViewSet):
             queryset = Offer.objects.all()
 
         # Filter by status
+        # Map frontend status names to backend status choices
+        STATUS_MAPPING = {
+            'new': 'pending',  # 'New' offers are actually 'pending' (newly created)
+            'expired': 'expired',
+            'accepted': 'accepted',
+            'declined': 'declined',
+            'pending': 'pending',
+            'approved': 'approved',
+            'rejected': 'rejected'
+        }
         status_filter = self.request.query_params.get('status', None)
         if status_filter:
-            queryset = queryset.filter(status=status_filter)
+            # Map the frontend status to backend status
+            backend_status = STATUS_MAPPING.get(status_filter, status_filter)
+            queryset = queryset.filter(status=backend_status)
 
         # Filter by lender
         lender_filter = self.request.query_params.get('lender', None)
@@ -193,37 +205,6 @@ class NotificationViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             return Notification.objects.filter(user=self.request.user).select_related('offer')
         return Notification.objects.none()
-
-    @action(detail=True, methods=['post'], url_path='mark_as_read')
-    def mark_as_read(self, request, pk=None):
-        """Mark a notification as read."""
-        if not request.user.is_authenticated:
-            return Response(
-                {'error': 'Authentication required'},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-        
-        try:
-            notification = self.get_object()
-            # Verify notification belongs to user
-            if notification.user != request.user:
-                return Response(
-                    {'error': 'Notification not found'},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            notification.is_read = True
-            notification.save()
-            
-            return Response({
-                'status': 'Marked as read',
-                'is_read': True
-            })
-        except Notification.DoesNotExist:
-            return Response(
-                {'error': 'Notification not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
 
 
 class HealthCheckView(APIView):

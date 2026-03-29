@@ -49,66 +49,32 @@ public_users = [
 ]
 
 users = []
-# Define profile data for users with diverse eligibility levels
-user_profiles = {
-    'alice': {  # Excellent profile - should see Good Fit & Possible
-        'credit_band': 'excellent',
-        'employment_status': 'employed',
-        'annual_income': 150000,
-    },
-    'mike': {  # Fair profile - should see Possible & Unlikely
-        'credit_band': 'fair',
-        'employment_status': 'self_employed',
-        'annual_income': 75000,
-    }
-}
-
-user_ids = {}
 for user_data in public_users:
-    username = user_data['username']
     user, created = User.objects.get_or_create(
-        username=username,
+        username=user_data['username'],
         defaults=user_data
     )
     if created:
         user.set_password('test@123')
-        
-        # Add profile data
-        if username in user_profiles:
-            profile = user_profiles[username]
-            user.credit_band = profile['credit_band']
-            user.employment_status = profile['employment_status']
-            user.annual_income = profile['annual_income']
-            print(f"  Setting profile for {username}:")
-            print(f"    Credit: {profile['credit_band']}, Employment: {profile['employment_status']}, Income: ${profile['annual_income']:,}")
-        
         user.save()
         print(f"  Created user: {user.username} (password: test@123)")
     else:
         print(f"  User already exists: {user.username}")
-        # Update existing user's profile
-        if username in user_profiles:
-            profile = user_profiles[username]
-            user.credit_band = profile['credit_band']
-            user.employment_status = profile['employment_status']
-            user.annual_income = profile['annual_income']
-            user.save()
     users.append(user)
-    user_ids[username] = user.id
 
 # Create 10 offers for each public user
 print("\nCreating offers for public users...")
 offer_templates = [
-    {"amount": 10000, "rate": 4.5, "apr": 4.8, "term": 36, "fee": 50, "status": "new"},   # 4.5% - Good Fit
-    {"amount": 12000, "rate": 5.5, "apr": 5.7, "term": 36, "fee": 60, "status": "new"},    # 5.5% - Good Fit
-    {"amount": 15000, "rate": 6.5, "apr": 6.7, "term": 48, "fee": 75, "status": "new"},    # 6.5% - Possible
-    {"amount": 18000, "rate": 7.5, "apr": 7.7, "term": 48, "fee": 90, "status": "new"},    # 7.5% - Possible
-    {"amount": 20000, "rate": 8.5, "apr": 8.7, "term": 60, "fee": 100, "status": "new"},   # 8.5% - Possible
-    {"amount": 22000, "rate": 9.5, "apr": 9.7, "term": 60, "fee": 110, "status": "new"},   # 9.5% - Likely Unlikely
-    {"amount": 25000, "rate": 10.5, "apr": 10.7, "term": 60, "fee": 125, "status": "new"}, # 10.5% - Unlikely
-    {"amount": 28000, "rate": 11.5, "apr": 11.7, "term": 60, "fee": 140, "status": "new"}, # 11.5% - Unlikely
-    {"amount": 8000, "rate": 5.0, "apr": 5.2, "term": 36, "fee": 40, "status": "accepted"}, # 5.0% - Good Fit
-    {"amount": 16000, "rate": 7.0, "apr": 7.2, "term": 48, "fee": 80, "status": "pending"}, # 7.0% - Possible
+    {"amount": 10000, "rate": 5.9, "apr": 6.2, "term": 36, "fee": 50, "status": "new"},
+    {"amount": 15000, "rate": 4.9, "apr": 5.1, "term": 48, "fee": 75, "status": "new"},
+    {"amount": 25000, "rate": 7.9, "apr": 8.1, "term": 60, "fee": 100, "status": "accepted"},
+    {"amount": 5000, "rate": 8.9, "apr": 9.2, "term": 24, "fee": 25, "status": "expired"},
+    {"amount": 20000, "rate": 6.5, "apr": 6.8, "term": 36, "fee": 100, "status": "new"},
+    {"amount": 30000, "rate": 5.5, "apr": 5.8, "term": 48, "fee": 150, "status": "pending"},
+    {"amount": 8000, "rate": 7.2, "apr": 7.5, "term": 24, "fee": 40, "status": "new"},
+    {"amount": 12000, "rate": 6.0, "apr": 6.3, "term": 36, "fee": 60, "status": "new"},
+    {"amount": 18000, "rate": 5.8, "apr": 6.1, "term": 48, "fee": 90, "status": "accepted"},
+    {"amount": 22000, "rate": 6.8, "apr": 7.1, "term": 60, "fee": 110, "status": "new"},
 ]
 
 lenders_list = list(Lender.objects.all()[:3])  # Use first 3 lenders

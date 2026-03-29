@@ -102,63 +102,51 @@ class OfferSerializer(serializers.ModelSerializer):
 
     def get_eligibility_label(self, obj):
         """Calculate eligibility label based on user profile and offer details."""
-        request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
-            return None
+        from decimal import Decimal
         
-        user = request.user
+        user = obj.user
         offer = obj
         
-        # Score calculation based on user profile and offer
+        # Scoring logic
         score = 0
         
-        # Credit band scoring
-        credit_scores = {
-            'excellent': 4,
-            'good': 3,
-            'fair': 2,
-            'poor': 1
-        }
-        score += credit_scores.get(user.credit_band, 2)
+        # Credit band scoring (40 points max)
+        credit_bands = {'excellent': 40, 'good': 30, 'fair': 20, 'poor': 10}
+        score += credit_bands.get(user.credit_band.lower(), 20)
         
-        # Annual income scoring
-        if user.annual_income and offer.loan_amount:
-            loan_amount_float = float(offer.loan_amount)
-            if user.annual_income >= loan_amount_float * 3:
-                score += 4
-            elif user.annual_income >= loan_amount_float * 2:
-                score += 3
-            elif user.annual_income >= loan_amount_float * 1.5:
-                score += 2
-            elif user.annual_income >= loan_amount_float:
-                score += 1
+        # Income vs loan amount (30 points max)
+        if user.annual_income:
+            income_ratio = float(user.annual_income) / float(offer.loan_amount)
+            if income_ratio >= 5:
+                score += 30
+            elif income_ratio >= 3:
+                score += 25
+            elif income_ratio >= 2:
+                score += 20
+            elif income_ratio >= 1.5:
+                score += 15
+            else:
+                score += 10
         
-        # Employment status scoring
-        employment_scores = {
-            'employed': 3,
-            'self_employed': 2,
-            'unemployed': 1
-        }
-        if user.employment_status:
-            score += employment_scores.get(user.employment_status, 2)
+        # Employment status (20 points max)
+        employment_bands = {'employed_full_time': 20, 'employed_part_time': 15, 'self_employed': 15, 'unemployed': 5}
+        score += employment_bands.get(user.employment_status.lower(), 10)
         
-        # Interest rate scoring
-        if offer.interest_rate <= 5:
-            score += 3
-        elif offer.interest_rate <= 8:
-            score += 2
+        # Interest rate factor (10 points max)
+        ir = offer.interest_rate
+        if ir <= 5:
+            score += 10
+        elif ir <= 7:
+            score += 8
+        elif ir <= 9:
+            score += 5
         else:
-            score += 1
+            score += 2
         
-        # Calculate maximum potential score
-        max_possible = 15  # 4+4+3+3+1 for best case
-        
-        # Determine label based on percentage of max possible
-        percentage = (score / max_possible) * 100
-        
-        if percentage >= 70:
+        # Determine label
+        if score >= 70:
             return 'Good Fit'
-        elif percentage >= 55:
+        elif score >= 55:
             return 'Possible'
         else:
             return 'Unlikely'
@@ -170,7 +158,6 @@ class OfferDetailSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     decision = serializers.SerializerMethodField()
     shortlisted = serializers.SerializerMethodField()
-    eligibility_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Offer
@@ -179,7 +166,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
             'interest_rate', 'apr', 'term_months',
             'origination_fee', 'monthly_payment', 'status',
             'expiry_date', 'lender_notes', 'created_at',
-            'updated_at', 'decision', 'shortlisted', 'eligibility_label'
+            'updated_at', 'decision', 'shortlisted'
         ]
 
     def get_decision(self, obj):
@@ -200,69 +187,6 @@ class OfferDetailSerializer(serializers.ModelSerializer):
                 offer=obj
             ).exists()
         return False
-
-    def get_eligibility_label(self, obj):
-        """Calculate eligibility label based on user profile and offer details."""
-        request = self.context.get('request')
-        if not request or not request.user.is_authenticated:
-            return None
-        
-        user = request.user
-        offer = obj
-        
-        # Score calculation based on user profile and offer
-        score = 0
-        
-        # Credit band scoring
-        credit_scores = {
-            'excellent': 4,
-            'good': 3,
-            'fair': 2,
-            'poor': 1
-        }
-        score += credit_scores.get(user.credit_band, 2)
-        
-        # Annual income scoring
-        if user.annual_income and offer.loan_amount:
-            loan_amount_float = float(offer.loan_amount)
-            if user.annual_income >= loan_amount_float * 3:
-                score += 4
-            elif user.annual_income >= loan_amount_float * 2:
-                score += 3
-            elif user.annual_income >= loan_amount_float * 1.5:
-                score += 2
-            elif user.annual_income >= loan_amount_float:
-                score += 1
-        
-        # Employment status scoring
-        employment_scores = {
-            'employed': 3,
-            'self_employed': 2,
-            'unemployed': 1
-        }
-        if user.employment_status:
-            score += employment_scores.get(user.employment_status, 2)
-        
-        # Interest rate scoring
-        if offer.interest_rate <= 5:
-            score += 3
-        elif offer.interest_rate <= 8:
-            score += 2
-        else:
-            score += 1
-        
-        # Calculate maximum potential score
-        max_possible = 15  # 4+4+3+3+1 for best case
-        
-        # Determine label based on percentage of max possible
-        percentage = (score / max_possible) * 100
-        
-        if percentage >= 70:
-            return 'Good Fit'
-        elif percentage >= 55:
-            return 'Possible'
-        else:
-            return 'Unlikely'
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
@@ -298,11 +222,6 @@ class ShortlistSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     """Serializer for notifications."""
-    is_unread = serializers.SerializerMethodField()
-    
     class Meta:
         model = Notification
-        fields = ['id', 'offer', 'message', 'is_read', 'is_unread', 'created_at']
-    
-    def get_is_unread(self, obj):
-        return not obj.is_read
+        fields = ['id', 'offer', 'message', 'is_read', 'created_at']

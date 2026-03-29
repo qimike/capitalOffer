@@ -124,12 +124,8 @@ export const api = {
   
   // Notifications endpoints
   notifications: {
-    getAll: (params = {}) => {
-      const queryParams = new URLSearchParams(params).toString()
-      return apiRequest(`/api/notifications/?${queryParams}`)
-    },
-    getAllUnread: () => apiRequest('/api/notifications/?is_read=false'),
-    markAsRead: (id) => apiRequest(`/api/notifications/${id}/mark_as_read/`, {
+    getAll: () => apiRequest('/api/notifications/'),
+    markAsRead: (id) => apiRequest(`/api/notifications/${id}/read/`, {
       method: 'POST'
     })
   }
