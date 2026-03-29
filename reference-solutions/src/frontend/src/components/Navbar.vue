@@ -31,7 +31,7 @@
               </RouterLink>
             </li>
             <li class="nav-item">
-              <RouterLink to="/shortlist" class="nav-link">
+              <RouterLink to="/offers?tab=shortlist" class="nav-link">
                 <i class="bi bi-heart me-1"></i>Shortlist
               </RouterLink>
             </li>
