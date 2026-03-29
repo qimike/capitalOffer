@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -147,17 +147,6 @@ const totalPages = computed(() => {
 
 const hasFilters = computed(() => {
   return filterStatus.value !== '' || searchQuery.value !== ''
-})
-
-// Watch for changes in filter criteria - reset to page 1 and fetch
-watch([filterStatus, searchQuery, sortBy], () => {
-  currentPage.value = 1
-  fetchOffers()
-})
-
-// Watch for pagination changes
-watch(currentPage, () => {
-  fetchOffers()
 })
 
 onMounted(() => {
@@ -191,12 +180,6 @@ const fetchOffers = async () => {
     } else {
       offers.value = []
       console.log('No offers found in response')
-    }
-    // Extract count for pagination
-    if (data && data.count !== undefined) {
-      totalCount.value = data.count
-    } else {
-      totalCount.value = offers.value.length
     }
   } catch (err) {
     console.error('Error fetching offers:', err)

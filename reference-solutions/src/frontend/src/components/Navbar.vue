@@ -90,6 +90,7 @@ const router = useRouter()
 const route = useRoute()
 const isAuthenticated = ref(false)
 const userName = ref('')
+const pollIntervalRef = ref(null)
 
 // Function to update auth state
 const updateAuthState = () => {
@@ -101,22 +102,40 @@ onMounted(() => {
   // Initial state check
   updateAuthState()
   
-  // Listen for auth changes
+  // Listen for storage events (when localStorage changes in another tab/window)
   const handleStateChange = () => {
     updateAuthState()
   }
   
-  // Listen for storage events (when localStorage changes in another tab/window)
   window.addEventListener('storage', handleStateChange)
   
   // Listen for route changes to refresh auth state
   router.afterEach(() => {
     updateAuthState()
   })
+  
+  // Watch for changes in localStorage by polling (for same-page updates)
+  pollIntervalRef.value = setInterval(() => {
+    const currentUserName = localStorage.getItem('userName')
+    if (userName.value !== currentUserName) {
+      userName.value = currentUserName || 'User'
+    }
+    const currentIsAuth = localStorage.getItem('isAuthenticated')
+    if (isAuthenticated.value !== (currentIsAuth === 'true')) {
+      isAuthenticated.value = currentIsAuth === 'true'
+    }
+  }, 500)
 })
 
 onUnmounted(() => {
   // Clean up
+  if (window.__handleAuthStateChange) {
+    window.removeEventListener('storage', window.__handleAuthStateChange)
+  }
+  // Clear the interval
+  if (pollIntervalRef.value) {
+    clearInterval(pollIntervalRef.value)
+  }
 })
 
 const logout = () => {
