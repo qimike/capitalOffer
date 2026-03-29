@@ -183,6 +183,23 @@ class ShortlistViewSet(viewsets.ModelViewSet):
             return ShortlistItem.objects.filter(user=self.request.user).select_related('offer')
         return ShortlistItem.objects.none()
 
+    def perform_create(self, serializer):
+        """Set the user automatically from the request."""
+        # Fetch the offer by ID
+        offer_id = self.request.data.get('offer_id')
+        try:
+            offer = Offer.objects.get(id=offer_id)
+        except Offer.DoesNotExist:
+            from rest_framework.response import Response
+            return Response({'error': 'Offer not found'}, status=404)
+        
+        # Check if already shortlisted
+        if ShortlistItem.objects.filter(user=self.request.user, offer=offer).exists():
+            from rest_framework.response import Response
+            return Response({'error': 'Already shortlisted'}, status=400)
+        
+        serializer.save(user=self.request.user, offer=offer)
+
 
 class NotificationViewSet(viewsets.ModelViewSet):
     """API endpoint for user notifications."""

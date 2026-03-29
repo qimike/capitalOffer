@@ -85,7 +85,6 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only=True
     )
     has_decision = serializers.SerializerMethodField()
-    eligibility_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Offer
@@ -94,60 +93,11 @@ class OfferSerializer(serializers.ModelSerializer):
             'interest_rate', 'apr', 'term_months',
             'origination_fee', 'monthly_payment', 'status',
             'expiry_date', 'lender_notes', 'created_at',
-            'has_decision', 'eligibility_label'
+            'has_decision'
         ]
 
     def get_has_decision(self, obj):
         return hasattr(obj, 'decision')
-
-    def get_eligibility_label(self, obj):
-        """Calculate eligibility label based on user profile and offer details."""
-        user = obj.user
-        offer = obj
-        
-        # Scoring logic
-        score = 0
-        
-        # Credit band scoring (40 points max)
-        credit_bands = {'excellent': 40, 'good': 30, 'fair': 20, 'poor': 10}
-        score += credit_bands.get(user.credit_band.lower(), 20)
-        
-        # Income vs loan amount (30 points max)
-        if user.annual_income:
-            income_ratio = float(user.annual_income) / float(offer.loan_amount)
-            if income_ratio >= 5:
-                score += 30
-            elif income_ratio >= 3:
-                score += 25
-            elif income_ratio >= 2:
-                score += 20
-            elif income_ratio >= 1.5:
-                score += 15
-            else:
-                score += 10
-        
-        # Employment status (20 points max)
-        employment_bands = {'employed_full_time': 20, 'employed_part_time': 15, 'self_employed': 15, 'unemployed': 5}
-        score += employment_bands.get(user.employment_status.lower(), 10)
-        
-        # Interest rate factor (10 points max)
-        ir = offer.interest_rate
-        if ir <= 5:
-            score += 10
-        elif ir <= 7:
-            score += 8
-        elif ir <= 9:
-            score += 5
-        else:
-            score += 2
-        
-        # Determine label
-        if score >= 70:
-            return 'Good Fit'
-        elif score >= 55:
-            return 'Possible'
-        else:
-            return 'Unlikely'
 
 
 class OfferDetailSerializer(serializers.ModelSerializer):
@@ -212,10 +162,22 @@ class OfferDecisionSerializer(serializers.ModelSerializer):
 class ShortlistSerializer(serializers.ModelSerializer):
     """Serializer for shortlist items."""
     offer = OfferSerializer(read_only=True)
+    offer_id = serializers.PrimaryKeyRelatedField(
+        write_only=True,
+        source='offer',
+        queryset=Offer.objects.all()
+    )
 
     class Meta:
         model = ShortlistItem
-        fields = ['id', 'offer', 'created_at']
+        fields = ['id', 'offer', 'offer_id', 'created_at']
+        
+    def to_representation(self, instance):
+        """Custom representation to only include offer without offer_id on read."""
+        representation = super().to_representation(instance)
+        # Remove offer_id from the response since it's write-only
+        representation.pop('offer_id', None)
+        return representation
 
 
 class NotificationSerializer(serializers.ModelSerializer):
