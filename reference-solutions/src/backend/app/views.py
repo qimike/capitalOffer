@@ -183,23 +183,6 @@ class ShortlistViewSet(viewsets.ModelViewSet):
             return ShortlistItem.objects.filter(user=self.request.user).select_related('offer')
         return ShortlistItem.objects.none()
 
-    def perform_create(self, serializer):
-        """Set the user automatically from the request."""
-        # Fetch the offer by ID
-        offer_id = self.request.data.get('offer_id')
-        try:
-            offer = Offer.objects.get(id=offer_id)
-        except Offer.DoesNotExist:
-            from rest_framework.response import Response
-            return Response({'error': 'Offer not found'}, status=404)
-        
-        # Check if already shortlisted
-        if ShortlistItem.objects.filter(user=self.request.user, offer=offer).exists():
-            from rest_framework.response import Response
-            return Response({'error': 'Already shortlisted'}, status=400)
-        
-        serializer.save(user=self.request.user, offer=offer)
-
 
 class NotificationViewSet(viewsets.ModelViewSet):
     """API endpoint for user notifications."""
@@ -210,6 +193,37 @@ class NotificationViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             return Notification.objects.filter(user=self.request.user).select_related('offer')
         return Notification.objects.none()
+
+    @action(detail=True, methods=['post'], url_path='mark_as_read')
+    def mark_as_read(self, request, pk=None):
+        """Mark a notification as read."""
+        if not request.user.is_authenticated:
+            return Response(
+                {'error': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        try:
+            notification = self.get_object()
+            # Verify notification belongs to user
+            if notification.user != request.user:
+                return Response(
+                    {'error': 'Notification not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            notification.is_read = True
+            notification.save()
+            
+            return Response({
+                'status': 'Marked as read',
+                'is_read': True
+            })
+        except Notification.DoesNotExist:
+            return Response(
+                {'error': 'Notification not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class HealthCheckView(APIView):

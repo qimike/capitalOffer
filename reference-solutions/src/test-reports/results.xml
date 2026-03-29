@@ -1,0 +1,18 @@
+<testsuites id="" name="" tests="6" failures="0" skipped="0" errors="0" time="13.009046">
+<testsuite name="auth.spec.ts" timestamp="2026-03-29T19:06:59.475Z" hostname="Google Chrome" tests="2" failures="0" skipped="0" time="9.23" errors="0">
+<testcase name="Authentication Tests › should navigate to signup from login" classname="auth.spec.ts" time="4.184">
+</testcase>
+<testcase name="Authentication Tests › should show error for invalid credentials" classname="auth.spec.ts" time="5.046">
+</testcase>
+</testsuite>
+<testsuite name="navigation.spec.ts" timestamp="2026-03-29T19:06:59.475Z" hostname="Google Chrome" tests="4" failures="0" skipped="0" time="9.658" errors="0">
+<testcase name="Navbar &amp; Navigation Tests › should display navbar logo" classname="navigation.spec.ts" time="2.845">
+</testcase>
+<testcase name="Navbar &amp; Navigation Tests › should display navigation links" classname="navigation.spec.ts" time="3.058">
+</testcase>
+<testcase name="Navbar &amp; Navigation Tests › should handle navigation to offers from unauthenticated state" classname="navigation.spec.ts" time="2.087">
+</testcase>
+<testcase name="Navbar &amp; Navigation Tests › should redirect to login when accessing authenticated routes" classname="navigation.spec.ts" time="1.668">
+</testcase>
+</testsuite>
+</testsuites>

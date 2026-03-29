@@ -122,22 +122,14 @@ export const api = {
     })
   },
   
-  // Shortlist endpoints
-  shortlist: {
-    getAll: () => apiRequest('/api/shortlist/'),
-    add: (offerId) => apiRequest('/api/shortlist/', {
-      method: 'POST',
-      body: JSON.stringify({ offer_id: offerId })
-    }),
-    remove: (id) => apiRequest(`/api/shortlist/${id}/`, {
-      method: 'DELETE'
-    })
-  },
-  
   // Notifications endpoints
   notifications: {
-    getAll: () => apiRequest('/api/notifications/'),
-    markAsRead: (id) => apiRequest(`/api/notifications/${id}/read/`, {
+    getAll: (params = {}) => {
+      const queryParams = new URLSearchParams(params).toString()
+      return apiRequest(`/api/notifications/?${queryParams}`)
+    },
+    getAllUnread: () => apiRequest('/api/notifications/?is_read=false'),
+    markAsRead: (id) => apiRequest(`/api/notifications/${id}/mark_as_read/`, {
       method: 'POST'
     })
   }
