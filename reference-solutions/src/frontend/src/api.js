@@ -122,6 +122,18 @@ export const api = {
     })
   },
   
+  // Shortlist endpoints
+  shortlist: {
+    getAll: () => apiRequest('/api/shortlist/'),
+    add: (offerId) => apiRequest('/api/shortlist/', {
+      method: 'POST',
+      body: JSON.stringify({ offer_id: offerId })
+    }),
+    remove: (id) => apiRequest(`/api/shortlist/${id}/`, {
+      method: 'DELETE'
+    })
+  },
+  
   // Notifications endpoints
   notifications: {
     getAll: () => apiRequest('/api/notifications/'),
