@@ -85,6 +85,17 @@
               </p>
             </div>
 
+            <!-- Eligibility Label -->
+            <div class="mb-3">
+              <span
+                class="badge fs-6"
+                :class="eligibilityBadgeClass(offer.eligibility_label)"
+              >
+                <i :class="eligibilityIcon(offer.eligibility_label)" class="me-1"></i>
+                {{ offer.eligibility_label }}
+              </span>
+            </div>
+
             <div class="progress mb-2" style="height: 6px;">
               <div
                 class="progress-bar"
@@ -198,6 +209,24 @@ const statusBadgeClass = (status) => {
     pending: 'bg-warning'
   }
   return classes[status] || 'bg-secondary'
+}
+
+const eligibilityBadgeClass = (label) => {
+  const classes = {
+    'Good Fit': 'bg-success',
+    'Possible': 'bg-warning text-dark',
+    'Unlikely': 'bg-danger'
+  }
+  return classes[label] || 'bg-secondary'
+}
+
+const eligibilityIcon = (label) => {
+  const icons = {
+    'Good Fit': 'bi-check-circle-fill',
+    'Possible': 'bi-question-circle-fill',
+    'Unlikely': 'bi-x-circle-fill'
+  }
+  return icons[label] || 'bi-question-circle-fill'
 }
 
 const resetFilters = () => {

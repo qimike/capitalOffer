@@ -74,9 +74,21 @@ class OfferViewSet(viewsets.ModelViewSet):
             queryset = Offer.objects.all()
 
         # Filter by status
+        # Map frontend status names to backend status choices
+        STATUS_MAPPING = {
+            'new': 'pending',  # 'New' offers are actually 'pending' (newly created)
+            'expired': 'expired',
+            'accepted': 'accepted',
+            'declined': 'declined',
+            'pending': 'pending',
+            'approved': 'approved',
+            'rejected': 'rejected'
+        }
         status_filter = self.request.query_params.get('status', None)
         if status_filter:
-            queryset = queryset.filter(status=status_filter)
+            # Map the frontend status to backend status
+            backend_status = STATUS_MAPPING.get(status_filter, status_filter)
+            queryset = queryset.filter(status=backend_status)
 
         # Filter by lender
         lender_filter = self.request.query_params.get('lender', None)
