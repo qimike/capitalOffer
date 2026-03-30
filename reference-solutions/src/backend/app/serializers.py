@@ -102,20 +102,18 @@ class OfferSerializer(serializers.ModelSerializer):
 
     def get_eligibility_label(self, obj):
         """Calculate eligibility label based on user profile and offer details."""
-        from decimal import Decimal
-        
         user = obj.user
         offer = obj
         
         # Scoring logic
         score = 0
         
-        # Credit band scoring (40 points max) - default to 'fair' if None
+        # Credit band scoring (40 points max) - handle None values
         credit_bands = {'excellent': 40, 'good': 30, 'fair': 20, 'poor': 10}
         credit_band = user.credit_band.lower() if user.credit_band else 'fair'
         score += credit_bands.get(credit_band, 20)
         
-        # Income vs loan amount (30 points max) - default to low if no income data
+        # Income vs loan amount (30 points max) - handle None values
         if user.annual_income:
             income_ratio = float(user.annual_income) / float(offer.loan_amount)
             if income_ratio >= 5:
@@ -132,7 +130,7 @@ class OfferSerializer(serializers.ModelSerializer):
             # No income data - give lower score
             score += 10
         
-        # Employment status (20 points max) - default to employed if None
+        # Employment status (20 points max) - handle None values
         employment_bands = {'employed_full_time': 20, 'employed_part_time': 15, 'self_employed': 15, 'unemployed': 5}
         employment_status = user.employment_status.lower() if user.employment_status else 'employed_full_time'
         score += employment_bands.get(employment_status, 10)
