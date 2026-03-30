@@ -17,16 +17,15 @@
     <div class="card mb-4">
       <div class="card-body">
         <div class="row g-3">
-      <div class="col-md-3">
-        <select class="form-select" v-model="filterStatus">
-          <option value="">All Status</option>
-          <option value="new">New</option>
-          <option value="pending">Pending</option>
-          <option value="accepted">Accepted</option>
-          <option value="declined">Declined</option>
-          <option value="expired">Expired</option>
-        </select>
-      </div>
+          <div class="col-md-3">
+            <select class="form-select" v-model="filterStatus">
+              <option value="">All Status</option>
+              <option value="new">New</option>
+              <option value="accepted">Accepted</option>
+              <option value="expired">Expired</option>
+              <option value="pending">Pending</option>
+            </select>
+          </div>
           <div class="col-md-3">
             <select class="form-select" v-model="sortBy">
               <option value="amount_desc">Amount: High to Low</option>
@@ -130,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -154,40 +153,17 @@ onMounted(() => {
   fetchOffers()
 })
 
-// Watch for changes in filters and sort to reload offers and reset to page 1
-watch([filterStatus, sortBy, searchQuery], () => {
-  currentPage.value = 1
-  fetchOffers()
-})
-
-// Watch for page changes
-watch(currentPage, (newPage) => {
-  fetchOffers()
-})
-
 const fetchOffers = async () => {
   loading.value = true
   console.log('\n=== Fetching offers for user ===')
-  console.log('Filter status:', filterStatus.value)
-  console.log('Sort by:', sortBy.value)
-  console.log('Search query:', searchQuery.value)
   try {
-    const params = {
+    const data = await api.offers.getAll({
       page: currentPage.value,
       limit: limit.value,
-      sort: sortBy.value
-    }
-    // Only include status if it's not empty
-    if (filterStatus.value) {
-      params.status = filterStatus.value
-    }
-    if (searchQuery.value) {
-      params.search = searchQuery.value
-    }
-    
-    console.log('Request params:', params)
-    
-    const data = await api.offers.getAll(params)
+      status: filterStatus.value || '',
+      sort: sortBy.value,
+      search: searchQuery.value || ''
+    })
     
     console.log('API Response:', data)
     
