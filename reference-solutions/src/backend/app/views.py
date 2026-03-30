@@ -194,6 +194,37 @@ class NotificationViewSet(viewsets.ModelViewSet):
             return Notification.objects.filter(user=self.request.user).select_related('offer')
         return Notification.objects.none()
 
+    @action(detail=True, methods=['post'], url_path='mark_as_read')
+    def mark_as_read(self, request, pk=None):
+        """Mark a notification as read."""
+        if not request.user.is_authenticated:
+            return Response(
+                {'error': 'Authentication required'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        try:
+            notification = self.get_object()
+            # Verify notification belongs to user
+            if notification.user != request.user:
+                return Response(
+                    {'error': 'Notification not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            notification.is_read = True
+            notification.save()
+            
+            return Response({
+                'status': 'Marked as read',
+                'is_read': True
+            })
+        except Notification.DoesNotExist:
+            return Response(
+                {'error': 'Notification not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 
 class HealthCheckView(APIView):
     """Health check endpoint."""
