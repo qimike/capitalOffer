@@ -17,15 +17,16 @@
     <div class="card mb-4">
       <div class="card-body">
         <div class="row g-3">
-          <div class="col-md-3">
-            <select class="form-select" v-model="filterStatus">
-              <option value="">All Status</option>
-              <option value="new">New</option>
-              <option value="accepted">Accepted</option>
-              <option value="expired">Expired</option>
-              <option value="pending">Pending</option>
-            </select>
-          </div>
+      <div class="col-md-3">
+        <select class="form-select" v-model="filterStatus">
+          <option value="">All Status</option>
+          <option value="new">New</option>
+          <option value="pending">Pending</option>
+          <option value="accepted">Accepted</option>
+          <option value="declined">Declined</option>
+          <option value="expired">Expired</option>
+        </select>
+      </div>
           <div class="col-md-3">
             <select class="form-select" v-model="sortBy">
               <option value="amount_desc">Amount: High to Low</option>
@@ -70,22 +71,12 @@
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-start mb-3">
               <h5 class="card-title mb-0">{{ offer.lender.name }}</h5>
-              <div class="d-flex align-items-center gap-2">
-                <span
-                  class="badge"
-                  :class="statusBadgeClass(offer.status)"
-                >
-                  {{ offer.status }}
-                </span>
-                <button
-                  class="btn btn-sm"
-                  :class="isShortlisted(offer.id) ? 'btn-primary' : 'btn-outline-secondary'"
-                  @click="toggleShortlist(offer)"
-                  title="Add to shortlist"
-                >
-                  <i class="bi" :class="isShortlisted(offer.id) ? 'bi-bookmark-fill' : 'bi-bookmark'"></i>
-                </button>
-              </div>
+              <span
+                class="badge"
+                :class="statusBadgeClass(offer.status)"
+              >
+                {{ offer.status }}
+              </span>
             </div>
 
             <div class="mb-3">
@@ -139,7 +130,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -150,7 +141,6 @@ const sortBy = ref('amount_desc')
 const currentPage = ref(1)
 const limit = ref(10)
 const totalCount = ref(0)
-const shortlistedOfferIds = ref(new Set())
 
 const totalPages = computed(() => {
   return Math.max(1, Math.ceil(totalCount.value / limit.value))
@@ -160,40 +150,44 @@ const hasFilters = computed(() => {
   return filterStatus.value !== '' || searchQuery.value !== ''
 })
 
-onMounted(async () => {
-  await loadShortlistedOffers()
+onMounted(() => {
   fetchOffers()
 })
 
-const loadShortlistedOffers = async () => {
-  try {
-    const data = await api.shortlist.getAll()
-    
-    if (Array.isArray(data)) {
-      data.forEach(item => {
-        shortlistedOfferIds.value.add(item.offer.id)
-      })
-    } else if (data && Array.isArray(data.items)) {
-      data.items.forEach(item => {
-        shortlistedOfferIds.value.add(item.offer.id)
-      })
-    }
-  } catch (err) {
-    console.error('Error loading shortlist:', err)
-  }
-}
+// Watch for changes in filters and sort to reload offers and reset to page 1
+watch([filterStatus, sortBy, searchQuery], () => {
+  currentPage.value = 1
+  fetchOffers()
+})
+
+// Watch for page changes
+watch(currentPage, (newPage) => {
+  fetchOffers()
+})
 
 const fetchOffers = async () => {
   loading.value = true
   console.log('\n=== Fetching offers for user ===')
+  console.log('Filter status:', filterStatus.value)
+  console.log('Sort by:', sortBy.value)
+  console.log('Search query:', searchQuery.value)
   try {
-    const data = await api.offers.getAll({
+    const params = {
       page: currentPage.value,
       limit: limit.value,
-      status: filterStatus.value || '',
-      sort: sortBy.value,
-      search: searchQuery.value || ''
-    })
+      sort: sortBy.value
+    }
+    // Only include status if it's not empty
+    if (filterStatus.value) {
+      params.status = filterStatus.value
+    }
+    if (searchQuery.value) {
+      params.search = searchQuery.value
+    }
+    
+    console.log('Request params:', params)
+    
+    const data = await api.offers.getAll(params)
     
     console.log('API Response:', data)
     
@@ -217,46 +211,6 @@ const fetchOffers = async () => {
   } finally {
     loading.value = false
     console.log('Final offers count:', offers.value.length)
-  }
-}
-
-const isShortlisted = (offerId) => {
-  return shortlistedOfferIds.value.has(offerId)
-}
-
-const toggleShortlist = async (offer) => {
-  try {
-    if (isShortlisted(offer.id)) {
-      // Remove from shortlist
-      const items = await api.shortlist.getAll()
-      const itemToRemove = Array.isArray(items) 
-        ? items.find(item => item.offer.id === offer.id)
-        : null
-      
-      if (itemToRemove) {
-        await api.shortlist.remove(itemToRemove.id)
-        shortlistedOfferIds.value.delete(offer.id)
-        console.log('Removed from shortlist')
-      }
-    } else {
-      // Add to shortlist
-      await api.shortlist.add(offer.id)
-      shortlistedOfferIds.value.add(offer.id)
-      console.log('Added to shortlist')
-    }
-  } catch (err) {
-    // Handle duplicate shortlist error
-    if (err.details?.error === 'Already shortlisted') {
-      console.log('Offer already shortlisted')
-      // Don't add to the set again
-      return
-    } else if (err.details?.error) {
-      console.error('Error toggling shortlist:', err.details.error)
-      alert(err.details.error)
-    } else {
-      console.error('Error toggling shortlist:', err)
-      alert('Failed to update shortlist. Please try again.')
-    }
   }
 }
 

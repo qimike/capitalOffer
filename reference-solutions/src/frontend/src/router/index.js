@@ -35,12 +35,6 @@ const router = createRouter({
       name: 'profile',
       component: () => import('@/views/Profile.vue'),
       meta: { requiresAuth: true }
-    },
-    {
-      path: '/shortlist',
-      name: 'shortlist',
-      component: () => import('@/views/Shortlist.vue'),
-      meta: { requiresAuth: true }
     }
   ]
 })

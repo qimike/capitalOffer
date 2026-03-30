@@ -162,22 +162,10 @@ class OfferDecisionSerializer(serializers.ModelSerializer):
 class ShortlistSerializer(serializers.ModelSerializer):
     """Serializer for shortlist items."""
     offer = OfferSerializer(read_only=True)
-    offer_id = serializers.PrimaryKeyRelatedField(
-        write_only=True,
-        source='offer',
-        queryset=Offer.objects.all()
-    )
 
     class Meta:
         model = ShortlistItem
-        fields = ['id', 'offer', 'offer_id', 'created_at']
-        
-    def to_representation(self, instance):
-        """Custom representation to only include offer without offer_id on read."""
-        representation = super().to_representation(instance)
-        # Remove offer_id from the response since it's write-only
-        representation.pop('offer_id', None)
-        return representation
+        fields = ['id', 'offer', 'created_at']
 
 
 class NotificationSerializer(serializers.ModelSerializer):
