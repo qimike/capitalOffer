@@ -52,9 +52,9 @@ for user_data in private_users:
         defaults=user_data
     )
     if created:
-        user.set_password('test@123')
+        user.set_password('private@456')
         user.save()
-        print(f"  Created user: {user.username} (password: test@123)")
+        print(f"  Created user: {user.username} (password: private@456)")
     else:
         print(f"  User already exists: {user.username}")
     users.append(user)
@@ -122,7 +122,7 @@ print(f"Jane's offers: {Offer.objects.filter(user=users[0]).count()}")
 print(f"Tina's offers: {Offer.objects.filter(user=users[1]).count()}")
 print("\nPrivate test user credentials:")
 print("  Username: jane")
-print("  Password: test@123")
+print("  Password: private@456")
 print("  Username: tina")
-print("  Password: test@123")
+print("  Password: private@456")
 print("\nYou can now login at http://localhost:3000/api/auth/login/")

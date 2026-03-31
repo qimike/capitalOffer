@@ -12,6 +12,6 @@ test.describe('Task 10 - Notifications Feature', () => {
 
   test('should navigate to notifications page and see notifications header', async ({ page }) => {
     await page.goto('/notifications')
-    await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible()
+    await expect(page.locator('h2', { hasText: 'Notifications' })).toBeVisible()
   })
 })
