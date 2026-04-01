@@ -62,8 +62,8 @@ test.describe('Task 7 - Sort Offers Feature', () => {
     await page.goto('/offers')
     
     // Manually navigate to page 2 if available
-    const nextButton = page.locator('a:has-text("Next")')
-    if (await nextButton.count() > 0 && await nextButton.isEnabled()) {
+    const nextButton = page.locator('.page-item:not(.disabled):has-text("Next")')
+    if (await nextButton.count() > 0) {
       await nextButton.click()
       await page.waitForTimeout(500)
     }

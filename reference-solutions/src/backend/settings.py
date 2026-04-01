@@ -156,7 +156,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 6,  # Default to 6 items per page
+    'PAGE_SIZE': 10,  # Default to 10 items per page
     'PAGE_SIZE_QUERY_PARAM': 'limit',  # Accept 'limit' parameter from frontend
     'MAX_PAGE_SIZE': 100,  # Maximum allowed page size
 }

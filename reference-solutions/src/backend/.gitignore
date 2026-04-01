@@ -1,7 +1,4 @@
 venv
 .env
-__pycache__/
+__pycache__
 staticfiles/
-*.pyc
-__MACOSX/
-.DS_Store

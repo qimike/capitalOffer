@@ -78,8 +78,8 @@ test.describe('Task 4 - Edit borrower profile', () => {
   test('should save profile and update navbar immediately', async ({ page }) => {
     await page.goto('/profile');
     
-    // Get initial navbar username
-    const initialUserName = await page.locator('.nav-link:has-text("User")').first().innerText();
+    // Get initial navbar username (dropdown toggle with user's name)
+    const initialUserName = await page.locator('#userDropdown').first().innerText();
     
     // Click Edit Profile
     await page.locator('button:has-text("Edit Profile")').first().click();
@@ -95,7 +95,7 @@ test.describe('Task 4 - Edit borrower profile', () => {
     await page.waitForTimeout(500);
     
     // Verify navbar updates automatically (within 1 second)
-    const navbarUserName = await page.locator('.nav-link:has-text("User")').first().innerText();
+    const navbarUserName = await page.locator('#userDropdown').first().innerText();
     expect(navbarUserName).not.toBe(initialUserName);
   });
 
