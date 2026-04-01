@@ -1,0 +1,39 @@
+version: '3.8'
+
+# Private evaluation overlay
+# Usage: docker compose -f ../reference-solutions/docker-compose.yml -f docker-compose.private.yml up -d --build
+
+services:
+  backend:
+    volumes:
+      - ./scripts/seed_private.py:/app/seed_private.py:ro
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.52.0-noble
+    container_name: capitaloffer_playwright
+    working_dir: /tests
+    environment:
+      - BASE_URL=http://frontend:80
+    volumes:
+      - ../reference-solutions/src/frontend/playwright.config.ts:/tests/playwright.config.ts:ro
+      - ../reference-solutions/src/frontend/package.json:/tests/package.json:ro
+      - ./private-test-cases:/tests/tests/tasks:ro
+      - ../tasks/test-cases/base-tests:/tests/tests/base-tests:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    command: >
+      sh -c "npm install && npx playwright test --reporter=list"
+    profiles:
+      - test
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: capitaloffer_network
+    driver: bridge
