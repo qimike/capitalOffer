@@ -9,16 +9,15 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy entrypoint script first
-COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
-
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
+
+# Make entrypoint executable
+RUN chmod +x docker-entrypoint.sh
 
 RUN mkdir -p /app/staticfiles && chmod -R 777 /app/staticfiles
 
