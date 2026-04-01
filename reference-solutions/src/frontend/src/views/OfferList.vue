@@ -85,17 +85,6 @@
               </p>
             </div>
 
-            <!-- Eligibility Label -->
-            <div class="mb-3">
-              <small class="text-muted">Eligibility:</small>
-              <span
-                class="badge ms-2"
-                :class="eligibilityBadgeClass(offer.eligibility_label)"
-              >
-                {{ offer.eligibility_label || 'Loading...' }}
-              </span>
-            </div>
-
             <div class="progress mb-2" style="height: 6px;">
               <div
                 class="progress-bar"
@@ -140,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -151,17 +140,6 @@ const sortBy = ref('amount_desc')
 const currentPage = ref(1)
 const limit = ref(10)
 const totalCount = ref(0)
-
-// Watch for changes in search, filter, or sort to reset pagination
-watch([searchQuery, filterStatus, sortBy], () => {
-  currentPage.value = 1
-  fetchOffers()
-})
-
-// Watch for pagination changes
-watch(currentPage, () => {
-  fetchOffers()
-})
 
 const totalPages = computed(() => {
   return Math.max(1, Math.ceil(totalCount.value / limit.value))
@@ -220,17 +198,6 @@ const statusBadgeClass = (status) => {
     pending: 'bg-warning'
   }
   return classes[status] || 'bg-secondary'
-}
-
-const eligibilityBadgeClass = (label) => {
-  if (label === 'Good Fit') {
-    return 'bg-success'
-  } else if (label === 'Possible') {
-    return 'bg-warning text-dark'
-  } else if (label === 'Unlikely') {
-    return 'bg-secondary'
-  }
-  return 'bg-secondary'
 }
 
 const resetFilters = () => {

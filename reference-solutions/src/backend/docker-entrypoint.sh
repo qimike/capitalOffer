@@ -54,8 +54,8 @@ else
 fi
 
 echo "=========================================="
-echo "Starting Django Development Server"
+echo "Starting Gunicorn Production Server"
 echo "=========================================="
 
-# Run the development server
-exec python manage.py runserver 0.0.0.0:3000
+# Run the production server with gunicorn
+exec gunicorn app.wsgi:application --bind 0.0.0.0:3000 --workers 3 --timeout 120
