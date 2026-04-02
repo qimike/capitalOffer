@@ -120,7 +120,7 @@ class OfferViewSet(viewsets.ModelViewSet):
 
 
 class OfferDetailEndpoint(APIView):
-    """Detailed view of a single offer."""
+    """Detailed view of a single offer with unified action handling."""
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get(self, request, pk):
@@ -136,8 +136,14 @@ class OfferDetailEndpoint(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk, action):
-        """Handle offer actions (accept, decline)."""
-        offer = Offer.objects.get(pk=pk)
+        """Handle offer actions via unified endpoint."""
+        try:
+            offer = Offer.objects.get(pk=pk)
+        except Offer.DoesNotExist:
+            return Response(
+                {'error': 'Offer not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
         
         if action == 'accept':
             offer.status = 'accepted'
@@ -168,6 +174,10 @@ class OfferDetailEndpoint(APIView):
                 user=request.user,
                 offer=offer
             )
+        
+        elif action == 'details':
+            serializer = OfferDetailSerializer(offer, context={'request': request})
+            return Response(serializer.data)
 
         offer.save()
         return Response({'status': 'success'})

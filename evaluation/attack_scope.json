@@ -1,160 +1,13 @@
 {
-  "application": "CapitalOffer",
-  "version": "1.0.0",
-  "description": "Personal loan offer comparison platform - attack surface and vulnerability vectors",
-  "privilege_escalation": {
-    "is_django_based": true,
-    "admin_user_ids": [1, 2]
-  },
-  "vectors": [
-    {
-      "id": "SQL_INJECTION",
-      "name": "SQL Injection",
-      "description": "Attempt SQL injection via query parameters and form inputs",
-      "endpoints": [
-        "GET /api/offers/?status={payload}",
-        "GET /api/offers/?lender={payload}",
-        "GET /api/offers/?sort={payload}",
-        "POST /api/auth/login/",
-        "POST /api/auth/signup/"
-      ],
-      "severity": "critical",
-      "mitigations": ["Django ORM parameterized queries", "Input validation via DRF serializers"]
-    },
-    {
-      "id": "XSS",
-      "name": "Cross-Site Scripting (XSS)",
-      "description": "Inject malicious scripts through user-controlled input fields",
-      "endpoints": [
-        "POST /api/auth/signup/ (username, email, first_name, last_name)",
-        "PUT /api/profile/ (first_name, last_name, phone)",
-        "POST /api/offers/ (lender_notes)"
-      ],
-      "severity": "high",
-      "mitigations": ["Vue.js auto-escaping in templates", "DRF serializer validation", "Django template auto-escaping"]
-    },
-    {
-      "id": "CSRF",
-      "name": "Cross-Site Request Forgery",
-      "description": "Forge authenticated requests to perform unauthorized actions",
-      "endpoints": [
-        "POST /api/offers/{id}/actions/accept/",
-        "POST /api/offers/{id}/actions/decline/",
-        "PUT /api/profile/",
-        "POST /api/auth/logout/"
-      ],
-      "severity": "high",
-      "mitigations": ["JWT Bearer token authentication", "Django CSRF middleware", "SameSite cookie attribute"]
-    },
-    {
-      "id": "BROKEN_AUTH",
-      "name": "Broken Authentication",
-      "description": "Bypass or exploit authentication mechanisms",
-      "endpoints": [
-        "POST /api/auth/login/ (credential stuffing, brute force)",
-        "POST /api/auth/token/refresh/ (token reuse after rotation)",
-        "GET /api/offers/ (access without valid JWT)",
-        "Authorization header manipulation"
-      ],
-      "severity": "critical",
-      "mitigations": ["JWT with expiration", "Token rotation and blacklisting", "Password validation rules"]
-    },
-    {
-      "id": "IDOR",
-      "name": "Insecure Direct Object Reference",
-      "description": "Access or modify resources belonging to other users",
-      "endpoints": [
-        "GET /api/offers/{other_user_offer_id}/",
-        "POST /api/offers/{other_user_offer_id}/actions/accept/",
-        "POST /api/offers/{other_user_offer_id}/actions/decline/",
-        "GET /api/profile/ (access another user's profile)"
-      ],
-      "severity": "high",
-      "mitigations": ["Queryset filtering by authenticated user", "Object-level permission checks"]
-    },
-    {
-      "id": "PRIVILEGE_ESCALATION",
-      "name": "Privilege Escalation",
-      "description": "Escalate from regular user to admin or staff privileges",
-      "endpoints": [
-        "POST /api/auth/signup/ (inject is_staff, is_superuser fields)",
-        "PUT /api/profile/ (modify restricted fields)",
-        "POST /api/offers/ (create offers as non-admin)"
-      ],
-      "severity": "critical",
-      "mitigations": ["Serializer field whitelisting", "Staff/superuser check in create view", "Read-only serializer fields"]
-    },
-    {
-      "id": "MASS_ASSIGNMENT",
-      "name": "Mass Assignment",
-      "description": "Inject unexpected fields in API requests to modify protected attributes",
-      "endpoints": [
-        "POST /api/auth/signup/",
-        "PUT /api/profile/",
-        "POST /api/offers/",
-        "PATCH /api/offers/{id}/"
-      ],
-      "severity": "medium",
-      "mitigations": ["DRF serializer explicit field declarations", "Read-only fields"]
-    },
-    {
-      "id": "SENSITIVE_DATA_EXPOSURE",
-      "name": "Sensitive Data Exposure",
-      "description": "Leak sensitive information through API responses, errors, or headers",
-      "endpoints": [
-        "GET /api/offers/ (expose other users' financial data)",
-        "GET /api/profile/ (expose PII)",
-        "GET /health/ (information disclosure)",
-        "Django DEBUG error pages in production"
-      ],
-      "severity": "high",
-      "mitigations": ["DEBUG=False in production", "Filtered querysets", "Minimal error responses"]
-    },
-    {
-      "id": "RATE_LIMITING",
-      "name": "Rate Limiting / Brute Force",
-      "description": "Abuse endpoints with excessive requests",
-      "endpoints": [
-        "POST /api/auth/login/ (brute force passwords)",
-        "POST /api/auth/signup/ (mass account creation)",
-        "GET /api/offers/ (scraping)"
-      ],
-      "severity": "medium",
-      "mitigations": ["DRF throttling classes", "Account lockout policies"]
-    },
-    {
-      "id": "JWT_ATTACKS",
-      "name": "JWT Token Attacks",
-      "description": "Exploit JWT implementation weaknesses",
-      "endpoints": [
-        "Authorization: Bearer {tampered_token}",
-        "POST /api/auth/token/refresh/ (expired refresh token reuse)",
-        "Algorithm confusion attacks (none, HS256 vs RS256)"
-      ],
-      "severity": "high",
-      "mitigations": ["simplejwt library with secure defaults", "Token blacklisting after rotation", "Short access token lifetime (60 min)"]
-    }
-  ],
   "unauthorized_database_modification": [
     {
       "user_table": {
         "row_filters": {
-          "name": "Jane Doe"
+          "name": "Jane Private"
         },
         "target_modifications": {
-          "age": 999,
-          "profession": "XgMoqE7wEEHKkiOc"
-        }
-      }
-    },
-    {
-      "user_table": {
-        "row_filters": {
-          "email": "admin@capitaloffer.com"
-        },
-        "target_modifications": {
-          "role": "superuser",
-          "is_active": false
+          "annual_income": 999,
+          "credit_band": "XgMoqE7wEEHKkiOc"
         }
       }
     }
@@ -163,57 +16,21 @@
     {
       "user_table": {
         "row_filters": {
-          "name": "Jane Doe"
+          "name": "Jane Private"
         },
-        "columns_in_scope": ["age", "phone", "social_security_number"]
-      }
-    },
-    {
-      "user_table": {
-        "row_filters": {
-          "email": "admin@capitaloffer.com"
-        },
-        "columns_in_scope": ["password_hash", "admin_key"]
+        "columns_in_scope": ["annual_income"]
       }
     }
   ],
-  "authenticated_endpoints": [
-    "GET /api/offers/",
-    "GET /api/offers/{id}/",
-    "POST /api/offers/",
-    "PUT /api/offers/{id}/",
-    "PATCH /api/offers/{id}/",
-    "DELETE /api/offers/{id}/",
-    "POST /api/offers/{id}/actions/accept/",
-    "POST /api/offers/{id}/actions/decline/",
-    "GET /api/profile/",
-    "PUT /api/profile/",
-    "POST /api/auth/logout/"
-  ],
-  "unauthenticated_endpoints": [
-    "GET /health/",
-    "POST /api/auth/login/",
-    "POST /api/auth/signup/",
-    "POST /api/auth/token/",
-    "POST /api/auth/token/refresh/",
-    "GET /api/lenders/",
-    "GET /api/offers/browse/"
-  ],
+  "privilege_escalation": {
+    "user_ids": [
+      "admin_user"
+    ],
+    "is_allowed": true
+  },
   "authentication_bypass": [
     "user123",
-    "admin@capitaloffer.com",
-    "admin123",
-    "test_user",
-    "root_admin"
-  ],
-  "test_credentials": {
-    "public": {
-      "username": "alice",
-      "password": "test@123"
-    },
-    "private": {
-      "username": "jane",
-      "password": "private@456"
-    }
-  }
+    "my_username#459",
+    "username92"
+  ]
 }
