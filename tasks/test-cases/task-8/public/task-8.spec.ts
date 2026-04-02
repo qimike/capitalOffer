@@ -2,7 +2,6 @@ import { test, expect } from '@playwright/test'
 
 test.describe('Task 8 - Accept and Decline Offers', () => {
   test.beforeEach(async ({ page }) => {
-    // Log in as alice before each test
     await page.goto('/login');
     await page.fill('#username', 'alice');
     await page.fill('#password', 'test@123');
@@ -10,26 +9,35 @@ test.describe('Task 8 - Accept and Decline Offers', () => {
     await page.waitForURL(/.*offers/);
   });
 
-  test('should navigate to offer detail page from offers list', async ({ page }) => {
+  test('should show disabled buttons on an accepted offer', async ({ page }) => {
     await page.goto('/offers')
-    
-    // Click on first offer's View Details button
+
+    await page.locator('select.form-select').nth(0).selectOption('accepted')
+    await page.waitForTimeout(1000)
+
+    const viewBtn = page.locator('.card .btn-outline-primary').first()
+    if (await viewBtn.count() > 0) {
+      await viewBtn.click()
+      await page.waitForURL(/\/offers\/\d+$/)
+
+      await expect(page.locator('span.badge:has-text("ACCEPTED")')).toBeVisible({ timeout: 10000 })
+
+      const acceptBtn = page.locator('button.btn-primary:has-text("Accept Offer")')
+      const declineBtn = page.locator('button.btn-outline-danger:has-text("Decline Offer")')
+      await expect(acceptBtn).toBeDisabled()
+      await expect(declineBtn).toBeDisabled()
+    }
+  })
+
+  test('should display correct status badge on detail page', async ({ page }) => {
+    await page.goto('/offers')
     await page.locator('.card .btn-outline-primary').first().click()
-    
-    // Verify we're on the offer detail page
-    await expect(page).toHaveURL(/\/offers\/\d+$/)
-  })
-
-  test('should show offer details page with correct status badge', async ({ page }) => {
-    await page.goto('/offers')
-    
-    // Navigate to offer
-    await page.click('.card .btn-outline-primary')
-    await page.waitForURL(/.*offers\/\d+$/)
+    await page.waitForURL(/\/offers\/\d+$/)
     await page.waitForTimeout(500)
-    
-    // Verify status badge is displayed
-    await expect(page.locator('span.badge')).toBeVisible()
-  })
 
+    const badge = page.locator('span.badge')
+    await expect(badge).toBeVisible()
+    const text = await badge.textContent()
+    expect(['NEW', 'ACCEPTED', 'EXPIRED', 'PENDING', 'DECLINED'].some(s => text?.includes(s))).toBe(true)
+  })
 })

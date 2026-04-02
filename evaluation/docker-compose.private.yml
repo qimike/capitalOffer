@@ -5,19 +5,26 @@ version: '3.8'
 
 services:
   backend:
+    environment:
+      - SEED_PRIVATE=true
+
+  frontend:
+    build:
+      context: ../reference-solutions
+      dockerfile: ../evaluation/Dockerfile.frontend
     volumes:
-      - ./scripts/seed_private.py:/app/seed_private.py:ro
+      - ../evaluation/nginx.private.conf:/etc/nginx/conf.d/default.conf:ro
 
   playwright:
-    image: mcr.microsoft.com/playwright:v1.52.0-noble
+    image: mcr.microsoft.com/playwright:v1.58.2-noble
     container_name: capitaloffer_playwright
     working_dir: /tests
     environment:
       - BASE_URL=http://frontend:80
     volumes:
-      - ../reference-solutions/src/frontend/playwright.config.ts:/tests/playwright.config.ts:ro
+      - ../evaluation/playwright.docker.config.ts:/tests/playwright.config.ts:ro
       - ../reference-solutions/src/frontend/package.json:/tests/package.json:ro
-      - ./private-test-cases:/tests/tests/tasks:ro
+      - ../evaluation/private-test-cases:/tests/tests/tasks:ro
       - ../tasks/test-cases/base-tests:/tests/tests/base-tests:ro
     depends_on:
       backend:

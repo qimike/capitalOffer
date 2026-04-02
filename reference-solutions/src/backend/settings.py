@@ -155,10 +155,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10,  # Default to 10 items per page
-    'PAGE_SIZE_QUERY_PARAM': 'limit',  # Accept 'limit' parameter from frontend
-    'MAX_PAGE_SIZE': 100,  # Maximum allowed page size
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 # Simple JWT settings

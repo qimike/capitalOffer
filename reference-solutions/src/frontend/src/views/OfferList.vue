@@ -129,7 +129,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { api } from '@/api'
 
 const offers = ref([])
@@ -170,15 +170,19 @@ const fetchOffers = async () => {
     // Handle DRF pagination response format
     if (data && data.results) {
       offers.value = data.results
+      totalCount.value = data.count || data.results.length
       console.log('Offers extracted from results:', offers.value.length)
     } else if (Array.isArray(data)) {
       offers.value = data
+      totalCount.value = data.length
       console.log('Offers is array:', offers.value.length)
     } else if (data && data.offers) {
       offers.value = data.offers
+      totalCount.value = data.total || data.offers.length
       console.log('Offers extracted from data.offers:', offers.value.length)
     } else {
       offers.value = []
+      totalCount.value = 0
       console.log('No offers found in response')
     }
   } catch (err) {
@@ -206,6 +210,16 @@ const resetFilters = () => {
   searchQuery.value = ''
   currentPage.value = 1
 }
+
+// Watch for filter/sort/page changes and re-fetch
+watch([filterStatus, sortBy, searchQuery], () => {
+  currentPage.value = 1
+  fetchOffers()
+})
+
+watch(currentPage, () => {
+  fetchOffers()
+})
 </script>
 
 <style scoped>

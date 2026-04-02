@@ -9,41 +9,40 @@ test.describe('Task 9 - Eligibility Label Feature', () => {
     await page.waitForURL(/.*offers/)
   })
 
-  test('should navigate to offer detail and verify eligibility label is present', async ({ page }) => {
+  test('should display eligibility badges on offer cards', async ({ page }) => {
     await page.goto('/offers')
-    
-    // Wait for offers to load
-    await page.locator('.card').first().waitFor({ state: 'visible', timeout: 5000 })
-    
-    // Click on first offer
-    await page.click('.card .btn-outline-primary')
-    await page.waitForURL(/.*offers\/\d+$/)
-    
-    // Wait for page to load
-    await page.waitForSelector('.card-body', { timeout: 5000 })
-    
-    // Verify eligibility badge is visible
-    const eligibilityBadge = page.locator('.card-body .badge[style*="bg-success" i], .card-body .badge.bg-success, .card-body .badge.bg-warning, .card-body .badge.bg-secondary')
-    await expect(eligibilityBadge).toBeVisible()
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    const eligibilityBadges = page.locator('.card .badge.fs-6')
+    const count = await eligibilityBadges.count()
+    expect(count).toBeGreaterThan(0)
+
+    const validLabels = ['Good Fit', 'Possible', 'Unlikely']
+    const labelTexts = await eligibilityBadges.allTextContents()
+    for (const text of labelTexts) {
+      const trimmed = text.trim()
+      expect(validLabels.some(v => trimmed.includes(v))).toBe(true)
+    }
   })
 
-  test('should verify all three categories exist in the offer list', async ({ page }) => {
+  test('should show correct badge color classes for eligibility labels', async ({ page }) => {
     await page.goto('/offers')
-    
-    // Wait for offers to load
-    await page.locator('.card').first().waitFor({ state: 'visible', timeout: 5000 })
-    
-    // Check for Good Fit (green)
-    const hasGoodFit = await page.locator('.card .badge.bg-success').count() > 0
-    
-    // Check for Possible (yellow)
-    const hasPossible = await page.locator('.card .badge.bg-warning').count() > 0
-    
-    // Check for Unlikely (gray)
-    const hasUnlikely = await page.locator('.card .badge.bg-secondary').count() > 0
-    
-    // At least one offer should have each category (based on seed data setup)
-    // Note: Depending on user profile, some categories may not appear
-    expect(hasGoodFit || hasPossible || hasUnlikely).toBe(false)
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    const greenBadges = await page.locator('.card .badge.fs-6.bg-success').count()
+    const yellowBadges = await page.locator('.card .badge.fs-6.bg-warning').count()
+    const redBadges = await page.locator('.card .badge.fs-6.bg-danger').count()
+
+    expect(greenBadges + yellowBadges + redBadges).toBeGreaterThan(0)
+  })
+
+  test('should have eligibility label on every offer card', async ({ page }) => {
+    await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    const eligibilityBadges = await page.locator('.card .badge.fs-6').count()
+    const offerCards = await page.locator('.card .btn-outline-primary').count()
+
+    expect(eligibilityBadges).toBe(offerCards)
   })
 })

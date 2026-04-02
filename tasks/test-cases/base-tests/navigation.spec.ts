@@ -19,14 +19,11 @@ test.describe('Navbar & Navigation Tests', () => {
   });
 
   test('should redirect to login when accessing authenticated routes', async ({ page }) => {
-    // Clear any authentication
     await page.context().clearCookies();
     await page.context().clearPermissions();
-    
-    // Try to access offers page
+
     await page.goto('/offers');
-    
-    // Should redirect to login (may have query param)
+
     await expect(page).toHaveURL(/\/login/);
   });
 

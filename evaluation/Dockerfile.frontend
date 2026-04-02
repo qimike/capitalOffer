@@ -1,0 +1,27 @@
+# Multi-stage build for private evaluation
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+COPY src/frontend/package*.json ./
+RUN npm install
+
+COPY src/frontend/ .
+
+RUN npm run build
+
+# After build, replace the hardcoded localhost:3000 URL with empty string
+# so all API requests become relative paths (e.g. /api/auth/login/)
+# which nginx will proxy to the backend container
+RUN find /app/dist -name '*.js' -exec sed -i 's|http://localhost:3000||g' {} +
+
+# Production stage
+FROM nginx:alpine
+
+RUN apk add --no-cache curl
+
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

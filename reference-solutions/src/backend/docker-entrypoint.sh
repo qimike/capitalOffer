@@ -48,7 +48,10 @@ echo "Checking if database needs seeding..."
 if ! python -c "from app.models import Offer; import sys; sys.exit(0 if Offer.objects.count() > 0 else 1)" 2>/dev/null; then
   echo "Database is empty, seeding data..."
   python seed_public.py
-  python seed_private.py
+  if [ "$SEED_PRIVATE" = "true" ]; then
+    echo "Seeding private evaluation data..."
+    python seed_private.py
+  fi
 else
   echo "Database already has data, skipping seeding."
 fi

@@ -281,19 +281,24 @@ class ProfileUpdateView(generics.RetrieveUpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         """Update only specific fields (name and phone)."""
-        partial = True
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
 
-        # If first_name or last_name is provided, set them on the user model
-        if serializer.validated_data.get('first_name'):
-            instance.first_name = serializer.validated_data['first_name']
-        if serializer.validated_data.get('last_name'):
-            instance.last_name = serializer.validated_data['last_name']
-        if serializer.validated_data.get('phone'):
-            instance.phone = serializer.validated_data['phone']
+        # Handle full_name by splitting into first_name and last_name
+        data = request.data.copy()
+        if 'full_name' in data:
+            parts = data['full_name'].strip().split(' ', 1)
+            data['first_name'] = parts[0] if parts else ''
+            data['last_name'] = parts[1] if len(parts) > 1 else ''
+            del data['full_name']
+
+        # Update the user fields directly
+        if 'first_name' in data:
+            instance.first_name = data['first_name']
+        if 'last_name' in data:
+            instance.last_name = data['last_name']
+        if 'phone' in data:
+            instance.phone = data['phone']
         instance.save()
 
+        serializer = self.get_serializer(instance)
         return Response(serializer.data)
