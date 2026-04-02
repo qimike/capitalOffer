@@ -47,7 +47,7 @@ python manage.py migrate --noinput
 echo "Checking if database needs seeding..."
 if ! python -c "from app.models import Offer; import sys; sys.exit(0 if Offer.objects.count() > 0 else 1)" 2>/dev/null; then
   echo "Database is empty, seeding data..."
-  python seed_public.py
+  python scripts/seed_public.py
 else
   echo "Database already has data, skipping seeding."
 fi
