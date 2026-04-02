@@ -4,7 +4,7 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright configuration for frontend testing
  */
 export default defineConfig({
-  testDir: './tests/tasks',
+  testDir: './tests/base-tests',
 
   /* Run tests in files in parallel */
   fullyParallel: true,

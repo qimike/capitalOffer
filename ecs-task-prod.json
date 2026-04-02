@@ -57,7 +57,7 @@
     },
     {
       "name": "db",
-      "image": "public.ecr.aws/docker/library/postgres:15-alpine",
+      "image": "public.ecr.aws/docker/library/postgres:14-alpine",
       "healthCheck": {
         "command": ["CMD-SHELL", "pg_isready -U postgres"],
         "interval": 10,
