@@ -15,8 +15,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY . .
-RUN chmod +x entrypoint.sh
 
+RUN chmod +x entrypoint.sh
 RUN mkdir -p /app/staticfiles && chmod -R 777 /app/staticfiles
 
 # Expose port

@@ -57,7 +57,7 @@ test.describe('Task 2 - Display offer detail page (private)', () => {
     await page.locator('.card .btn-outline-primary').first().click();
     await page.waitForURL(/\/offers\/\d+$/);
 
-    const badge = page.locator('span.badge');
+    const badge = page.locator('.card-body span.badge.fs-6');
     await expect(badge).toBeVisible();
     const badgeText = await badge.textContent();
     expect(['NEW', 'ACCEPTED', 'EXPIRED', 'PENDING', 'DECLINED'].some(s => badgeText?.includes(s))).toBe(true);

@@ -22,7 +22,7 @@ test.describe('Task 3 - Filter offers by status (private)', () => {
     await expect(page.locator('select.form-select').nth(0)).toHaveValue('');
 
     // Jane has 10 offers, all on page 1
-    const cardCount = await page.locator('.card .badge').count();
+    const cardCount = await page.locator('.card .d-flex .badge').count();
     expect(cardCount).toBe(10);
   });
 
@@ -33,7 +33,7 @@ test.describe('Task 3 - Filter offers by status (private)', () => {
     await page.waitForTimeout(500);
 
     // All visible offer badges should say "new"
-    const badges = await page.locator('.card .badge').allTextContents();
+    const badges = await page.locator('.card .d-flex .badge').allTextContents();
     expect(badges.length).toBeGreaterThan(0);
     for (const badge of badges) {
       expect(badge.trim().toLowerCase()).toBe('new');
@@ -46,7 +46,7 @@ test.describe('Task 3 - Filter offers by status (private)', () => {
     await page.locator('select.form-select').nth(0).selectOption('accepted');
     await page.waitForTimeout(500);
 
-    const badges = await page.locator('.card .badge').allTextContents();
+    const badges = await page.locator('.card .d-flex .badge').allTextContents();
     expect(badges.length).toBeGreaterThan(0);
     for (const badge of badges) {
       expect(badge.trim().toLowerCase()).toBe('accepted');
@@ -59,7 +59,7 @@ test.describe('Task 3 - Filter offers by status (private)', () => {
     await page.locator('select.form-select').nth(0).selectOption('expired');
     await page.waitForTimeout(500);
 
-    const badges = await page.locator('.card .badge').allTextContents();
+    const badges = await page.locator('.card .d-flex .badge').allTextContents();
     expect(badges.length).toBeGreaterThan(0);
     for (const badge of badges) {
       expect(badge.trim().toLowerCase()).toBe('expired');
@@ -71,12 +71,12 @@ test.describe('Task 3 - Filter offers by status (private)', () => {
     await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 });
 
     // Get total count of all offers before filtering
-    const totalCount = await page.locator('.card .badge').count();
+    const totalCount = await page.locator('.card .d-flex .badge').count();
 
     // Apply a filter first
     await page.locator('select.form-select').nth(0).selectOption('accepted');
     await page.waitForTimeout(1000);
-    const filteredCount = await page.locator('.card .badge').count();
+    const filteredCount = await page.locator('.card .d-flex .badge').count();
     expect(filteredCount).toBeLessThan(totalCount);
 
     // Click Clear
@@ -87,7 +87,7 @@ test.describe('Task 3 - Filter offers by status (private)', () => {
     await expect(page.locator('select.form-select').nth(0)).toHaveValue('');
 
     // Should show all offers again (same as total count)
-    const allCount = await page.locator('.card .badge').count();
+    const allCount = await page.locator('.card .d-flex .badge').count();
     expect(allCount).toBe(totalCount);
   });
 
