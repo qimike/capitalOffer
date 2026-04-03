@@ -6,7 +6,7 @@ The capitalOffer full-stack application is deployed to AWS ECS using Fargate. Th
 
 - **Frontend**: Vue.js application served by nginx container
 - **Backend**: Django REST API running on port 3000
-- **Database**: PostgreSQL 15 (managed by RDS or container)
+- **Database**: PostgreSQL 14 (managed by RDS or container)
 - **Network**: AWS VPC with awsvpc networking mode
 - **Load Balancing**: Application Load Balancer (ALB) in front of ECS services
 
@@ -21,12 +21,14 @@ Frontend (nginx) ← depends on → Backend (Django) ← depends on → Database
 ### Required Tools
 
 1. **AWS CLI** (v2 or later)
+
    ```bash
    brew install awscli
    aws --version
    ```
 
 2. **Docker** (latest version)
+
    ```bash
    brew install --cask docker
    docker --version
@@ -41,11 +43,13 @@ Frontend (nginx) ← depends on → Backend (Django) ← depends on → Database
 ### AWS Configuration
 
 1. Configure AWS credentials:
+
    ```bash
    aws configure
    ```
 
 2. Set your account ID as environment variable:
+
    ```bash
    export ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
    ```
@@ -347,6 +351,7 @@ aws cloudwatch get-metric-statistics \
 ### ECS Cluster Dashboard
 
 Access ECS monitoring in AWS Console:
+
 - Navigate to ECS Dashboard
 - Select "capitaloffer-cluster"
 - Click on service to view metrics
