@@ -10,12 +10,14 @@
   "acceptance_criteria": [
     "Log in as a user.",
     "Navigate to '/offers'.",
-    "Locate filter buttons (All, Pending, Approved, Rejected).",
-    "Click 'Pending'.",
-    "Verify only pending offers are displayed.",
-    "Click 'Approved'.",
-    "Verify only approved offers are displayed.",
-    "Click 'All'.",
+    "Locate the status filter dropdown (All Status, New, Accepted, Expired, Pending).",
+    "Select 'New'.",
+    "Verify only offers with 'new' status badges are displayed.",
+    "Select 'Accepted'.",
+    "Verify only offers with 'accepted' status badges are displayed.",
+    "Select 'Expired'.",
+    "Verify only offers with 'expired' status badges are displayed.",
+    "Click 'Clear' to reset filters.",
     "Verify all offers are shown again."
   ]
 }

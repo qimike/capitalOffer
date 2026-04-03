@@ -38,9 +38,15 @@ test.describe('Task 6 - Shortlist an Offer', () => {
     await page.goto('/shortlist')
     await page.waitForTimeout(1000)
 
+    const initialCount = await page.locator('.card h5.card-title').count()
+    expect(initialCount).toBeGreaterThan(0)
+
     page.on('dialog', dialog => dialog.accept())
     await page.locator('.card button.btn-outline-danger').first().click()
     await page.waitForTimeout(1000)
+
+    const newCount = await page.locator('.card h5.card-title').count()
+    expect(newCount).toBeLessThan(initialCount)
   })
 
   test('should navigate back to offers from shortlist', async ({ page }) => {

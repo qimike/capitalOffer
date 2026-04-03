@@ -83,6 +83,6 @@ test.describe('Task 6 - Shortlist an Offer (private)', () => {
     await page.goto('/shortlist')
     await page.locator('.btn:has-text("Back to Offers")').click()
     await expect(page).toHaveURL(/\/offers/)
-    await expect(page.locator('h2')).toContainText('My Offers')
+    await expect(page.locator('h2').filter({ hasText: 'My Offers' })).toBeVisible()
   })
 })
