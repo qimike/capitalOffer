@@ -96,7 +96,7 @@ test.describe('Task 9 - Eligibility Label Feature (private)', () => {
     const token = await page.evaluate(() => localStorage.getItem('authToken'))
 
     // Set profile to "excellent" credit with high income → should yield "Good Fit"
-    await page.request.put('http://localhost:3000/api/profile/', {
+    await page.request.put('http://backend:3000/api/profile/', {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       data: { credit_band: 'excellent', annual_income: 200000, employment_status: 'employed_full_time' }
     })
@@ -114,7 +114,7 @@ test.describe('Task 9 - Eligibility Label Feature (private)', () => {
     expect(allGoodFit).toBe(true)
 
     // Restore profile to defaults
-    await page.request.put('http://localhost:3000/api/profile/', {
+    await page.request.put('http://backend:3000/api/profile/', {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       data: { credit_band: null, annual_income: null, employment_status: null }
     })
