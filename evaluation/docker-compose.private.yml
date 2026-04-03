@@ -23,7 +23,7 @@ services:
       - BASE_URL=http://frontend:80
     volumes:
       - ../evaluation/playwright.docker.config.ts:/tests/playwright.config.ts:ro
-      - ../reference-solutions/src/frontend/package.json:/tests/package.json:ro
+      - ./package.json:/tests/package.json:ro
       - ../evaluation/private-test-cases:/tests/tests/tasks:ro
       - ../tasks/test-cases/base-tests:/tests/tests/base-tests:ro
     depends_on:

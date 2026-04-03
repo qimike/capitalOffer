@@ -56,4 +56,24 @@ test.describe('Task 2 - Display offer detail page', () => {
     await expect(page.locator('.breadcrumb')).toBeVisible();
     await expect(page.locator('.breadcrumb-item a')).toContainText('Offers');
   });
+
+  test('should display expiry date on detail page', async ({ page }) => {
+    await page.goto('/offers');
+    await page.locator('.card .btn-outline-primary').first().click();
+    await page.waitForURL(/\/offers\/\d+$/);
+
+    await expect(page.locator('text=Expiry Date')).toBeVisible();
+    const expiryText = await page.locator('strong:has-text("Expiry Date")').locator('..').textContent();
+    expect(expiryText).toMatch(/\d/);
+  });
+
+  test('should display lender notes if present', async ({ page }) => {
+    await page.goto('/offers');
+    await page.locator('.card .btn-outline-primary').first().click();
+    await page.waitForURL(/\/offers\/\d+$/);
+
+    await expect(page.locator('text=Lender Notes')).toBeVisible();
+    const notesText = await page.locator('strong:has-text("Lender Notes")').locator('..').textContent();
+    expect(notesText?.trim().length).toBeGreaterThan(0);
+  });
 });

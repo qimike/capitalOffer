@@ -194,6 +194,13 @@ class NotificationViewSet(viewsets.ModelViewSet):
             return Notification.objects.filter(user=self.request.user).select_related('offer')
         return Notification.objects.none()
 
+    @action(detail=True, methods=['post'], url_path='mark_as_read')
+    def mark_as_read(self, request, pk=None):
+        notification = self.get_object()
+        notification.is_read = True
+        notification.save()
+        return Response({'status': 'success'})
+
 
 class HealthCheckView(APIView):
     """Health check endpoint."""

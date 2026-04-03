@@ -62,4 +62,24 @@ test.describe('Task 2 - Display offer detail page (private)', () => {
     const badgeText = await badge.textContent();
     expect(['NEW', 'ACCEPTED', 'EXPIRED', 'PENDING', 'DECLINED'].some(s => badgeText?.includes(s))).toBe(true);
   });
+
+  test('should display expiry date on detail page', async ({ page }) => {
+    await page.goto('/offers');
+    await page.locator('.card .btn-outline-primary').first().click();
+    await page.waitForURL(/\/offers\/\d+$/);
+
+    await expect(page.locator('text=Expiry Date')).toBeVisible();
+    const expiryText = await page.locator('strong:has-text("Expiry Date")').locator('..').textContent();
+    expect(expiryText).toMatch(/\d/);
+  });
+
+  test('should display lender notes if present', async ({ page }) => {
+    await page.goto('/offers');
+    await page.locator('.card .btn-outline-primary').first().click();
+    await page.waitForURL(/\/offers\/\d+$/);
+
+    await expect(page.locator('text=Lender Notes')).toBeVisible();
+    const notesText = await page.locator('strong:has-text("Lender Notes")').locator('..').textContent();
+    expect(notesText?.trim().length).toBeGreaterThan(0);
+  });
 });

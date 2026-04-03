@@ -16,11 +16,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-RUN chmod +x docker-entrypoint.sh
+RUN chmod +x entrypoint.sh
 RUN mkdir -p /app/staticfiles && chmod -R 777 /app/staticfiles
 
 # Expose port
 EXPOSE 3000
 
 # Use custom entrypoint
-ENTRYPOINT ["sh", "docker-entrypoint.sh"]
+ENTRYPOINT ["sh", "entrypoint.sh"]

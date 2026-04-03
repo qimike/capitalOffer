@@ -170,6 +170,11 @@ class ShortlistSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     """Serializer for notifications."""
+    is_unread = serializers.SerializerMethodField()
+
     class Meta:
         model = Notification
-        fields = ['id', 'offer', 'message', 'is_read', 'created_at']
+        fields = ['id', 'offer', 'message', 'is_read', 'is_unread', 'created_at']
+
+    def get_is_unread(self, obj):
+        return not obj.is_read

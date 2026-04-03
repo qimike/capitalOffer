@@ -45,4 +45,62 @@ test.describe('Task 9 - Eligibility Label Feature', () => {
 
     expect(eligibilityBadges).toBe(offerCards)
   })
+
+  test('should display eligibility label on offer detail page', async ({ page }) => {
+    await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    // Record the eligibility label from the first card
+    const firstCardBadge = page.locator('.card .badge.fs-6').first()
+    const listLabel = (await firstCardBadge.textContent())!.trim()
+
+    // Click "View Details" on the first offer card
+    await page.locator('.card .btn-outline-primary').first().click()
+    await page.waitForURL(/.*offers\/\d+/)
+
+    // The detail page should show an eligibility badge with one of the valid labels
+    const validLabels = ['Good Fit', 'Possible', 'Unlikely']
+    const detailBadge = page.locator('.badge.fs-6').filter({ hasText: /Good Fit|Possible|Unlikely/ })
+    await expect(detailBadge).toBeVisible({ timeout: 10000 })
+
+    const detailLabel = (await detailBadge.textContent())!.trim()
+    expect(validLabels.some(v => detailLabel.includes(v))).toBe(true)
+  })
+
+  test('should update eligibility labels when profile data changes', async ({ page }) => {
+    await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    // Capture current eligibility labels
+    const beforeLabels = await page.locator('.card .badge.fs-6').allTextContents()
+    const beforeTrimmed = beforeLabels.map(t => t.trim())
+    expect(beforeTrimmed.length).toBeGreaterThan(0)
+
+    // Get auth token from localStorage
+    const token = await page.evaluate(() => localStorage.getItem('authToken'))
+
+    // Set profile to "excellent" credit with high income → should yield "Good Fit"
+    await page.request.put('http://localhost:3000/api/profile/', {
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      data: { credit_band: 'excellent', annual_income: 200000, employment_status: 'employed_full_time' }
+    })
+
+    // Reload offers page to pick up recalculated labels
+    await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    const afterLabels = await page.locator('.card .badge.fs-6').allTextContents()
+    const afterTrimmed = afterLabels.map(t => t.trim())
+    expect(afterTrimmed.length).toBeGreaterThan(0)
+
+    // The labels should have changed (all should now be "Good Fit" with excellent profile)
+    const allGoodFit = afterTrimmed.every(l => l.includes('Good Fit'))
+    expect(allGoodFit).toBe(true)
+
+    // Restore profile to defaults
+    await page.request.put('http://localhost:3000/api/profile/', {
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      data: { credit_band: null, annual_income: null, employment_status: null }
+    })
+  })
 })

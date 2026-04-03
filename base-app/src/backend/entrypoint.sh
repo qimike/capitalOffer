@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# docker-entrypoint.sh for Django backend
+# entrypoint.sh for Django backend
 # This script handles database migrations, seeding, and running the server
 
 set -e
@@ -47,18 +47,14 @@ python manage.py migrate --noinput
 echo "Checking if database needs seeding..."
 if ! python -c "from app.models import Offer; import sys; sys.exit(0 if Offer.objects.count() > 0 else 1)" 2>/dev/null; then
   echo "Database is empty, seeding data..."
-  python seed_public.py
-  if [ "$SEED_PRIVATE" = "true" ]; then
-    echo "Seeding private evaluation data..."
-    python seed_private.py
-  fi
+  python scripts/seed_public.py
 else
   echo "Database already has data, skipping seeding."
 fi
 
 echo "=========================================="
-echo "Starting Gunicorn Production Server"
+echo "Starting Django Development Server"
 echo "=========================================="
 
-# Run the production server with gunicorn
-exec gunicorn app.wsgi:application --bind 0.0.0.0:3000 --workers 3 --timeout 120
+# Run the development server
+exec python manage.py runserver 0.0.0.0:3000

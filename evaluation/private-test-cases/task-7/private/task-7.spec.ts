@@ -30,83 +30,91 @@ test.describe('Task 7 - Sort Offers Feature (private)', () => {
     await expect(sortDropdown).toHaveValue('amount_desc')
   })
 
-  test('should reorder cards when sorting by lowest interest rate', async ({ page }) => {
+  test('should sort by lowest interest rate and verify ascending order', async ({ page }) => {
     await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
 
-    // Get first card title before sorting
-    const beforeTitle = await page.locator('.card h5.card-title').first().textContent()
-
-    // Sort by interest rate ascending
     await page.locator('select.form-select').nth(1).selectOption('rate_asc')
     await page.waitForTimeout(1000)
 
-    // Verify cards are displayed
-    await expect(page.locator('.card').first()).toBeVisible()
+    const rateTexts = await page.locator('.card .text-muted.mb-0').allTextContents()
+    const rates = rateTexts
+      .map(t => { const m = t.match(/([\d.]+)%/); return m ? parseFloat(m[1]) : NaN })
+      .filter(n => !isNaN(n))
 
-    // First card title may change after sorting
-    const afterTitle = await page.locator('.card h5.card-title').first().textContent()
-    // At least the cards should still be present
-    const cardCount = await page.locator('.card .badge').count()
-    expect(cardCount).toBeGreaterThan(0)
+    expect(rates.length).toBeGreaterThan(1)
+    for (let i = 1; i < rates.length; i++) {
+      expect(rates[i]).toBeGreaterThanOrEqual(rates[i - 1])
+    }
   })
 
-  test('should sort by Amount Low to High and verify ordering', async ({ page }) => {
+  test('should sort by highest loan amount and verify descending order', async ({ page }) => {
     await page.goto('/offers')
-    await page.locator('select.form-select').nth(1).selectOption('amount_asc')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    await page.locator('select.form-select').nth(1).selectOption('amount_desc')
     await page.waitForTimeout(1000)
 
-    // Get all displayed amounts (h2 elements in cards)
-    const amountTexts = await page.locator('.card h2').allTextContents()
-    const amounts = amountTexts.map(t => {
-      const match = t.replace(/[^0-9.]/g, '')
-      return parseFloat(match)
-    }).filter(n => !isNaN(n))
+    const amountTexts = await page.locator('.card h2.text-primary').allTextContents()
+    const amounts = amountTexts
+      .map(t => { const m = t.replace(/[^0-9.]/g, ''); return parseFloat(m) })
+      .filter(n => !isNaN(n))
 
-    // Verify ascending order
+    expect(amounts.length).toBeGreaterThan(1)
     for (let i = 1; i < amounts.length; i++) {
-      expect(amounts[i]).toBeGreaterThanOrEqual(amounts[i - 1])
+      expect(amounts[i]).toBeLessThanOrEqual(amounts[i - 1])
+    }
+  })
+
+  test('should sort by soonest expiry and verify order via API', async ({ page }) => {
+    await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
+
+    const [response] = await Promise.all([
+      page.waitForResponse(resp => resp.url().includes('/api/offers') && resp.url().includes('expiry')),
+      page.locator('select.form-select').nth(1).selectOption('expiry_asc'),
+    ])
+
+    const json = await response.json()
+    const results = json.results || json
+    const expiryDates = results.map((o: any) => o.expiry_date)
+
+    expect(expiryDates.length).toBeGreaterThan(1)
+    for (let i = 1; i < expiryDates.length; i++) {
+      expect(new Date(expiryDates[i]).getTime()).toBeGreaterThanOrEqual(new Date(expiryDates[i - 1]).getTime())
     }
   })
 
   test('should reset to first page when changing sort', async ({ page }) => {
     await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
 
-    // Go to page 2 if possible
     const nextButton = page.locator('.page-item:not(.disabled):has-text("Next")')
     if (await nextButton.count() > 0) {
       await nextButton.locator('.page-link').click()
       await page.waitForTimeout(500)
     }
 
-    // Change sort
     await page.locator('select.form-select').nth(1).selectOption('rate_asc')
     await page.waitForTimeout(500)
 
-    await expect(page.locator('.pagination')).toBeVisible()
+    await expect(page.locator('.text-muted.ms-3')).toContainText('Page 1')
   })
 
   test('should combine status filter with sort', async ({ page }) => {
     await page.goto('/offers')
+    await page.locator('.card-title').first().waitFor({ state: 'visible', timeout: 10000 })
 
-    // Filter by "new" status
     await page.locator('select.form-select').nth(0).selectOption('new')
     await page.waitForTimeout(500)
 
-    // Sort by interest rate ascending
     await page.locator('select.form-select').nth(1).selectOption('rate_asc')
     await page.waitForTimeout(1000)
 
-    // Verify all badges are "new"
     const badges = await page.locator('.card .badge').allTextContents()
+    expect(badges.length).toBeGreaterThan(0)
     for (const badge of badges) {
       expect(badge.trim().toLowerCase()).toBe('new')
     }
-
-    // Verify cards are visible
-    await expect(page.locator('.card').first()).toBeVisible()
-  })
-
-  test.afterEach(async ({ page }) => {
-    await page.goto('/logout')
   })
 })

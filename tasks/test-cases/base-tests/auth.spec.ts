@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Authentication Tests', () => {
+test.describe('Authentication Tests (public)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
   });
@@ -23,6 +23,18 @@ test.describe('Authentication Tests', () => {
     await page.click('button[type="submit"]');
 
     await expect(page.locator('.alert')).toBeVisible();
+  });
+
+  test('should allow public test user to log in successfully', async ({ page }) => {
+    await page.goto('/login');
+
+    // Log in with public seed user
+    await page.fill('#username', 'alice');
+    await page.fill('#password', 'test@123');
+    await page.click('button[type="submit"]');
+
+    // Should redirect to offers page after successful login
+    await expect(page).toHaveURL(/.*offers/);
   });
 
 });

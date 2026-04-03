@@ -85,6 +85,7 @@ class OfferSerializer(serializers.ModelSerializer):
         read_only=True
     )
     has_decision = serializers.SerializerMethodField()
+    eligibility_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Offer
@@ -93,11 +94,65 @@ class OfferSerializer(serializers.ModelSerializer):
             'interest_rate', 'apr', 'term_months',
             'origination_fee', 'monthly_payment', 'status',
             'expiry_date', 'lender_notes', 'created_at',
-            'has_decision'
+            'has_decision', 'eligibility_label'
         ]
 
     def get_has_decision(self, obj):
         return hasattr(obj, 'decision')
+
+    def get_eligibility_label(self, obj):
+        """Calculate eligibility label based on user profile and offer details."""
+        user = obj.user
+        offer = obj
+        
+        # Scoring logic
+        score = 0
+        
+        # Credit band scoring (40 points max) - handle None values
+        credit_bands = {'excellent': 40, 'good': 30, 'fair': 20, 'poor': 10}
+        credit_band = user.credit_band.lower() if user.credit_band else 'fair'
+        score += credit_bands.get(credit_band, 20)
+        
+        # Income vs loan amount (30 points max) - handle None values
+        if user.annual_income:
+            income_ratio = float(user.annual_income) / float(offer.loan_amount)
+            if income_ratio >= 5:
+                score += 30
+            elif income_ratio >= 3:
+                score += 25
+            elif income_ratio >= 2:
+                score += 20
+            elif income_ratio >= 1.5:
+                score += 15
+            else:
+                score += 10
+        else:
+            # No income data - give lower score
+            score += 10
+        
+        # Employment status (20 points max) - handle None values
+        employment_bands = {'employed_full_time': 20, 'employed_part_time': 15, 'self_employed': 15, 'unemployed': 5}
+        employment_status = user.employment_status.lower() if user.employment_status else 'employed_full_time'
+        score += employment_bands.get(employment_status, 10)
+        
+        # Interest rate factor (10 points max)
+        ir = offer.interest_rate
+        if ir <= 5:
+            score += 10
+        elif ir <= 7:
+            score += 8
+        elif ir <= 9:
+            score += 5
+        else:
+            score += 2
+        
+        # Determine label
+        if score >= 70:
+            return 'Good Fit'
+        elif score >= 55:
+            return 'Possible'
+        else:
+            return 'Unlikely'
 
 
 class OfferDetailSerializer(serializers.ModelSerializer):
@@ -170,6 +225,11 @@ class ShortlistSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     """Serializer for notifications."""
+    is_unread = serializers.SerializerMethodField()
+
     class Meta:
         model = Notification
-        fields = ['id', 'offer', 'message', 'is_read', 'created_at']
+        fields = ['id', 'offer', 'message', 'is_read', 'is_unread', 'created_at']
+
+    def get_is_unread(self, obj):
+        return not obj.is_read

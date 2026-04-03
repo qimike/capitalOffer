@@ -129,6 +129,7 @@ test.describe('Task 4 - Edit borrower profile', () => {
     await page.reload();
     await page.waitForTimeout(500);
 
+    await expect(page.locator('.col-md-6:has-text("Full Name:")')).toContainText('Persisted User');
   });
 
   test('should handle empty full name (keep existing)', async ({ page }) => {

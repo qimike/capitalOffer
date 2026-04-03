@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Navbar & Navigation Tests', () => {
+test.describe('Navbar & Navigation Tests (public)', () => {
   test('should display navbar logo', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('.navbar-brand')).toContainText('Capital Offer');
@@ -25,6 +25,19 @@ test.describe('Navbar & Navigation Tests', () => {
     await page.goto('/offers');
 
     await expect(page).toHaveURL(/\/login/);
+  });
+
+  test('should show navbar with user info after public user login', async ({ page }) => {
+    // Log in with public seed user
+    await page.goto('/login');
+    await page.fill('#username', 'alice');
+    await page.fill('#password', 'test@123');
+    await page.click('button[type="submit"]');
+    await page.waitForURL(/.*offers/);
+
+    // After login, navbar should show authenticated state
+    await expect(page.locator('.navbar')).toBeVisible();
+    await expect(page.locator('.navbar a:has-text("Offers")')).toBeVisible();
   });
 
 });
