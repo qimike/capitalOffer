@@ -13,7 +13,7 @@ from app.models import User, Lender, Offer, OfferDecision, ShortlistItem, Notifi
 
 @api_view(['GET'])
 def health(request):
-    """Health check endpoint."""
+    """Health check endpoint at '/health' for ECS healthchecks."""
     return HttpResponse(status=200)
 from app.serializers import (
     UserSerializer, AuthTokenSerializer,

@@ -35,71 +35,6 @@
                 <i class="bi bi-heart me-1"></i>Shortlist
               </RouterLink>
             </li>
-            
-            <!-- Notification Bell -->
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle position-relative"
-                href="#"
-                id="notificationDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <div class="position-relative d-inline">
-                  <i class="bi bi-bell-fill"></i>
-                  <span
-                    v-if="unreadCount > 0"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-danger border border-2 border-primary"
-                    style="width: 18px; height: 18px; font-size: 10px; display: flex; align-items: center; justify-content: center;"
-                  >
-                    {{ unreadCount }}
-                  </span>
-                </div>
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationDropdown" style="min-width: 350px; max-height: 450px; overflow-y: auto;">
-                <li class="px-4 py-3 border-bottom bg-light">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0 text-primary">
-                      <i class="bi bi-bell-fill me-2"></i>Notifications
-                    </h6>
-                    <span v-if="unreadCount > 0" class="badge bg-primary rounded-pill">{{ unreadCount }} unread</span>
-                  </div>
-                </li>
-                <li v-if="notifications.length === 0" class="px-4 py-5 text-center">
-                  <i class="bi bi-bell-slash-fill display-5 text-muted"></i>
-                  <p class="mb-0 mt-3 text-muted">No notifications</p>
-                  <small class="text-muted">Check back later for updates!</small>
-                </li>
-                <li v-else-if="notifications.length > 0">
-                  <a
-                    v-for="notification in notifications.slice(0, 5)"
-                    :key="notification.id"
-                    class="dropdown-item"
-                    :class="{ 'bg-light': notification.is_unread }"
-                    @click.prevent="navigateToNotification(notification)"
-                  >
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span>{{ notification.message }}</span>
-                      <span v-if="notification.is_unread" class="badge bg-primary rounded-pill">New</span>
-                    </div>
-                    <small class="text-muted d-block mt-1">{{ formatDate(notification.created_at) }}</small>
-                  </a>
-                </li>
-                <li v-if="notifications.length > 0" class="border-top">
-                  <RouterLink to="/notifications" class="dropdown-item text-center fw-semibold">
-                    <i class="bi bi-arrow-right-circle me-2"></i>View All Notifications
-                  </RouterLink>
-                </li>
-                <li v-if="unreadCount > 0 && notifications.length > 0" class="border-top">
-                  <button class="dropdown-item text-center fw-semibold" @click.prevent="markAllAsRead">
-                    <i class="bi bi-check-all me-2"></i>Mark All as Read
-                  </button>
-                </li>
-              </ul>
-            </li>
-
-            <!-- User Dropdown -->
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -148,15 +83,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { api } from '@/api'
 
 const router = useRouter()
 const route = useRoute()
 const isAuthenticated = ref(false)
 const userName = ref('')
-const notifications = ref([])
 
 // Function to update auth state
 const updateAuthState = () => {
@@ -164,88 +97,9 @@ const updateAuthState = () => {
   userName.value = localStorage.getItem('userName') || 'User'
 }
 
-// Calculate unread count
-const unreadCount = computed(() => {
-  return notifications.value.filter(n => n.is_unread).length
-})
-
-// Fetch notifications
-const fetchNotifications = async () => {
-  try {
-    const data = await api.notifications.getAll()
-    console.log('API response:', data)
-    
-    // Handle paginated response (DRF) or direct array
-    let notificationsData = []
-    if (Array.isArray(data)) {
-      notificationsData = data
-    } else if (data && data.results && Array.isArray(data.results)) {
-      notificationsData = data.results
-    } else if (data && data.items && Array.isArray(data.items)) {
-      notificationsData = data.items
-    } else {
-      notificationsData = []
-    }
-    
-    notifications.value = notificationsData
-    console.log('Notifications loaded:', notificationsData.length, notificationsData)
-  } catch (err) {
-    console.error('Error fetching notifications:', err)
-    notifications.value = []
-  }
-}
-
-// Format date
-const formatDate = (dateTimeString) => {
-  if (!dateTimeString) return ''
-  const date = new Date(dateTimeString)
-  return date.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit'
-  })
-}
-
-// Navigate to notification page
-const navigateToNotification = (notification) => {
-  if (notification.is_unread) {
-    markAsRead(notification.id)
-  }
-  router.push('/notifications')
-}
-
-// Mark notification as read
-const markAsRead = async (id) => {
-  try {
-    await api.notifications.markAsRead(id)
-    const index = notifications.value.findIndex(n => n.id === id)
-    if (index !== -1) {
-      notifications.value[index].is_read = true
-      notifications.value[index].is_unread = false
-    }
-  } catch (err) {
-    console.error('Error marking notification as read:', err)
-  }
-}
-
-// Mark all as read
-const markAllAsRead = async () => {
-  try {
-    for (const notification of notifications.value) {
-      await markAsRead(notification.id)
-    }
-  } catch (err) {
-    console.error('Error marking all as read:', err)
-  }
-}
-
 onMounted(() => {
   // Initial state check
   updateAuthState()
-  
-  // Fetch notifications
-  fetchNotifications()
   
   // Listen for auth changes
   const handleStateChange = () => {

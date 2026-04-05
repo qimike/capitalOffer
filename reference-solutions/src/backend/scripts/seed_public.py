@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 import os
+import sys
 import django
 import datetime
+
+# Ensure the parent directory (backend root) is on the Python path
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 django.setup()

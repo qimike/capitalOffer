@@ -16,7 +16,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: "pg_isready -U postgres"
       interval: 5s
       timeout: 5s
       retries: 5
@@ -87,11 +87,11 @@ services:
       backend:
         condition: service_healthy
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:80/']
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:80 || exit 1']
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 20s
 
   # Nginx Reverse Proxy (Optional)
   nginx:

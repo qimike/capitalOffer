@@ -1,3 +1,7 @@
 node_modules
 package-lock.json
 test-reports
+__pycache__/
+*.pyc
+__MACOSX/
+.DS_Store

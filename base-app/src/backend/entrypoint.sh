@@ -13,8 +13,9 @@ echo "=========================================="
 max_attempts=30
 attempt=1
 DB_HOST=${DB_HOST:-localhost}
+DB_PORT=${DB_PORT:-5432}
 
-while ! nc -z $DB_HOST 5432; do
+while ! nc -z $DB_HOST $DB_PORT; do
   if [ $attempt -eq $max_attempts ]; then
     echo "❌ Database timeout"
     exit 1
@@ -47,7 +48,14 @@ python manage.py migrate --noinput
 echo "Checking if database needs seeding..."
 if ! python -c "from app.models import Offer; import sys; sys.exit(0 if Offer.objects.count() > 0 else 1)" 2>/dev/null; then
   echo "Database is empty, seeding data..."
-  python scripts/seed_public.py
+  SEED_MODE=${SEED_MODE:-public}
+  if [ "$SEED_MODE" = "private" ]; then
+    echo "SEED_MODE=private → running private seed..."
+    python scripts/seed_private.py
+  else
+    echo "SEED_MODE=public → running public seed..."
+    python scripts/seed_public.py
+  fi
 else
   echo "Database already has data, skipping seeding."
 fi

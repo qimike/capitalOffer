@@ -5,7 +5,7 @@
   "branch": "task-4",
   "test_case_location": [
     "tasks/test-cases/task-4/public/task-4.spec.ts",
-    "evaluation/private-test-cases/task-4/task-4.spec.ts"
+    "evaluation/private-test-cases/task-4/private/task-4.spec.ts"
   ],
   "acceptance_criteria": [
     "Log in as a user.",

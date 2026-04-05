@@ -6,7 +6,7 @@ version: '3.8'
 services:
   backend:
     environment:
-      - SEED_PRIVATE=true
+      - SEED_MODE=private
 
   frontend:
     build:

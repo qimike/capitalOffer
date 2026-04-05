@@ -1,10 +1,17 @@
 {
   "family": "app-prod-task",
   "networkMode": "awsvpc",
+  "taskRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::<ACCOUNT_ID>:role/ecsTaskExecutionRole",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  },
   "containerDefinitions": [
     {
       "name": "frontend-nginx",
       "image": "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/app-frontend-prod:latest",
+      "essential": true,
       "portMappings": [
         {
           "containerPort": 80
@@ -21,11 +28,20 @@
         "interval": 30,
         "timeout": 5,
         "retries": 3
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/app-prod",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "frontend-nginx"
+        }
       }
     },
     {
       "name": "backend",
       "image": "<ACCOUNT_ID>.dkr.ecr.us-east-1.amazonaws.com/app-backend:latest",
+      "essential": true,
       "portMappings": [
         {
           "containerPort": 3000
@@ -35,6 +51,10 @@
         {
           "name": "DEBUG",
           "value": "0"
+        },
+        {
+          "name": "DB_HOST",
+          "value": "localhost"
         },
         {
           "name": "NODE_ENV",
@@ -53,16 +73,33 @@
         "timeout": 5,
         "retries": 3,
         "startPeriod": 60
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/app-prod",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "backend"
+        }
       }
     },
     {
       "name": "db",
       "image": "public.ecr.aws/docker/library/postgres:14-alpine",
+      "essential": true,
       "healthCheck": {
         "command": ["CMD-SHELL", "pg_isready -U postgres"],
         "interval": 10,
         "timeout": 5,
         "retries": 5
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/app-prod",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "db"
+        }
       }
     }
   ],

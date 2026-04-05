@@ -5,6 +5,7 @@ CapitalOffer Full Stack Application with Python 3.13, Django 5.x, Vue 3, Bootstr
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Docker and Docker Compose
 - Node.js 18+ (for local development)
 - Python 3.13+ (for local backend development)
@@ -26,7 +27,7 @@ docker-compose logs -f backend
 docker-compose exec backend python manage.py migrate
 
 # Seed database (optional)
-docker-compose exec backend python seed_offers.py
+docker-compose exec backend python scripts/seed_public.py
 ```
 
 ### Local Development (Python 3.13)
@@ -86,7 +87,7 @@ base-app/
 ├── src/
 │   ├── backend/          # Django backend (Python 3.13, Django 5.x)
 │   │   ├── app/         # Django app
-│   │   ├── seed_offers.py  # Database seeding script
+│   │   ├── scripts/     # Seeding scripts (seed_public.py)
 │   │   ├── requirements.txt  # Python dependencies
 │   │   └── manage.py
 │   └── frontend/        # Vue 3 frontend
@@ -102,6 +103,7 @@ base-app/
 ## 🔑 API Endpoints
 
 ### Authentication
+
 - `POST /api/signup/` - User registration
 - `POST /api/login/` - User login
 - `POST /api/logout/` - User logout
@@ -109,6 +111,7 @@ base-app/
 - `POST /api/token/refresh/` - JWT token refresh
 
 ### Offers
+
 - `GET /api/offers/` - List offers
 - `GET /api/offers/{id}/` - Get offer details
 - `POST /api/offers/` - Create offer
@@ -119,10 +122,12 @@ base-app/
 - `POST /api/offers/{id}/actions/shortlist/` - Shortlist offer
 
 ### Profile
+
 - `GET /api/profile/` - Get user profile
 - `PUT /api/profile/` - Update user profile
 
 ### Lenders
+
 - `GET /api/lenders/` - List lenders
 
 ## 🗃️ Database
@@ -155,6 +160,7 @@ PQPASSWORD=postgres psql -h localhost -p 5433 -U postgres -d capitaloffer
 ## 🔐 Test Credentials
 
 ### Public Users
+
 - **Username**: alice
   - Email: test@gmail.com
   - Password: test@123
@@ -166,6 +172,7 @@ PQPASSWORD=postgres psql -h localhost -p 5433 -U postgres -d capitaloffer
   - Offers: 4 offers
 
 ### Private Users
+
 - **Username**: jane
   - Email: test@gmail.com
   - Password: test@123
@@ -178,16 +185,17 @@ PQPASSWORD=postgres psql -h localhost -p 5433 -U postgres -d capitaloffer
 
 ## 🚦 Available Services
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| Frontend | http://localhost:5173 | Vue 3 + Bootstrap 5 application |
-| Backend | http://localhost:3000 | Django REST API |
-| PostgreSQL | localhost:5433 | Database server |
-| Redis | localhost:6379 | Cache server |
+| Service    | URL                   | Description                     |
+| ---------- | --------------------- | ------------------------------- |
+| Frontend   | http://localhost:5173 | Vue 3 + Bootstrap 5 application |
+| Backend    | http://localhost:3000 | Django REST API                 |
+| PostgreSQL | localhost:5433        | Database server                 |
+| Redis      | localhost:6379        | Cache server                    |
 
 ## 🛠️ Environment Variables
 
 ### Backend (.env)
+
 ```
 DEBUG=1
 SECRET_KEY=your-secret-key
@@ -200,6 +208,7 @@ ALLOWED_HOSTS=localhost,127.0.0.1
 ```
 
 ### Frontend (.env)
+
 ```
 VITE_API_BASE_URL=http://localhost:3000
 VITE_APP_NAME=capitalOffer
@@ -246,7 +255,7 @@ python manage.py showmigrations
 
 # Reset database (DEVELOPMENT ONLY)
 python manage.py flush
-python seed_offers.py
+python scripts/seed_public.py
 ```
 
 ## 📝 Notes
